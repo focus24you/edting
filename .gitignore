@@ -1,0 +1,18 @@
+.venv/
+node_modules/
+# media is large - keep it out of git
+raw/**
+references/**
+exports/**
+transcripts/**
+projects/*/renders/
+*.mp4
+*.mov
+*.mkv
+*.webm
+*.wav
+*.mp3
+*.m4a
+!**/.gitkeep
+.DS_Store
+cookies.txt
