@@ -1,0 +1,10 @@
+{
+  "name": "_showcase",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "npx --prefix ../.. hyperframes preview",
+    "check": "npx --prefix ../.. hyperframes check",
+    "render": "npx --prefix ../.. hyperframes render"
+  }
+}

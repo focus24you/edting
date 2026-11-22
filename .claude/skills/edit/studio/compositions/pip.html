@@ -1,0 +1,41 @@
+<!doctype html>
+<!-- edit skill scene template: pip. Colors/fonts: ../brand/brand.css. Do not hard-code either here. -->
+<html lang="de" data-composition-variables='[{"id": "label", "type": "string", "label": "Label am Bild-im-Bild", "default": "Felix"}, {"id": "corner", "type": "string", "label": "br, bl, tr oder tl (wie die Klassen am Host-Video)", "default": "br"}, {"id": "duration", "type": "number", "label": "Länge in Sekunden (= data-duration am Host)", "default": 4}]'>
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="stylesheet" href="../brand/brand.css" />
+    <link rel="stylesheet" href="../brand/edit.css" />
+    <script src="../brand/gsap.min.js"></script>
+    <script src="../brand/edit.js"></script>
+    <style>
+      /* Label for the host <video class="edit-pip">. Add classes left/top on the video to match `corner`. */
+      .tag { position: absolute; right: var(--pip-m); bottom: calc(var(--pip-m) + var(--pip-w) * 9 / 16 + var(--u) * 18); background: var(--accent); color: var(--accent-ink); font-size: calc(var(--u) * 44); padding: calc(var(--u) * 10) calc(var(--u) * 18) calc(var(--u) * 3); line-height: 1; }
+      .tag.l { right: auto; left: var(--pip-m); }
+      .tag.t { bottom: auto; top: calc(var(--pip-m) + var(--pip-w) * 9 / 16 + var(--u) * 18); }
+    </style>
+  </head>
+  <body>
+    <!-- data-duration is a ceiling; the host element's data-duration decides the real length -->
+    <div id="root" data-composition-id="pip" data-width="1920" data-height="1080" data-start="0" data-duration="3600">
+      <div class="scene">
+      <div class="display tag"></div>
+      </div>
+    </div>
+    <script>
+      // HyperFrames scopes document / gsap / __hyperframes per instance in THIS inline script only,
+      // so variables, the scene node and the timeline are fetched here and handed to the shared helper.
+      (function () {
+        var tl = gsap.timeline({ paused: true });
+        EDIT.scene(window.__hyperframes.getVariables(), document.querySelector(".scene"), tl, function (v, tl, dur, q, root) {
+        var t = q(".tag"), c = String(v.corner || "br");
+        t.textContent = v.label || "";
+        if (c.indexOf("l") >= 0) t.classList.add("l");
+        if (c.charAt(0) === "t") t.classList.add("t");
+        tl.fromTo(t, { clipPath: "inset(0 100% 0 0)" }, { clipPath: "inset(0 0% 0 0)", duration: 0.4, ease: EDIT.EASE }, 0.2);
+        EDIT.out(tl, t, dur, 0.2);
+        });
+        window.__timelines["pip"] = tl;
+      })();
+    </script>
+  </body>
+</html>

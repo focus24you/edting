@@ -25,3 +25,10 @@ Media files are git-ignored: only code, templates and settings are committed.
 YouTube blocks downloads from cloud servers ("confirm you're not a bot"). Export your
 browser cookies to `cookies.txt` in this folder (git-ignored) and `scripts/dl.sh` uses them,
 or run the download on your own computer.
+
+## The `edit` skill
+
+`/edit` (in `.claude/skills/edit/`) holds the whole workflow plus 12 scene templates in the brand
+colors and fonts: captions, title card, chapter card, lower third, callout, list, stat, quote,
+screen frame, split screen, picture-in-picture, end card. Colors and fonts live in one file:
+`.claude/skills/edit/studio/brand/brand.css`.

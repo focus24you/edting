@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1920, height=1080" />
+    <link rel="stylesheet" href="brand/brand.css" />
+    <link rel="stylesheet" href="brand/edit.css" />
+    <script src="brand/gsap.min.js"></script>
+    <style>
+      html, body { width: 1920px; height: 1080px; background: var(--bg); }
+      #film { position: relative; width: 1920px; height: 1080px; overflow: hidden; }
+    </style>
+  </head>
+  <body>
+    <div id="film" data-composition-id="main" data-start="0" data-duration="50" data-width="1920" data-height="1080">
+
+      <div id="s01-title-card" class="layer" style="z-index:10" data-composition-id="s01-title-card" data-composition-src="compositions/title-card.html" data-start="0" data-duration="3.5" data-track-index="3" data-variable-values='{"kicker": "Neue Folge", "title": "So schneidest du *doppelt* so schnell", "duration": 3.5}'></div>
+      <div id="s02-chapter-card" class="layer" style="z-index:10" data-composition-id="s02-chapter-card" data-composition-src="compositions/chapter-card.html" data-start="3.5" data-duration="2.5" data-track-index="4" data-variable-values='{"number": "01", "title": "Das Setup", "duration": 2.5}'></div>
+      <div id="s03-list" class="layer" style="z-index:10" data-composition-id="s03-list" data-composition-src="compositions/list.html" data-start="6" data-duration="7" data-track-index="5" data-variable-values='{"title": "3 Schritte zum *fertigen* Video", "items": "Rohmaterial sichten|Pausen rausschneiden|Grafiken setzen", "duration": 7}'></div>
+      <div id="s04-stat" class="layer" style="z-index:10" data-composition-id="s04-stat" data-composition-src="compositions/stat.html" data-start="13" data-duration="4" data-track-index="6" data-variable-values='{"value": 87, "suffix": "%", "label": "weniger Zeit im Schnitt", "duration": 4}'></div>
+      <div id="s05-quote" class="layer" style="z-index:10" data-composition-id="s05-quote" data-composition-src="compositions/quote.html" data-start="17" data-duration="5" data-track-index="7" data-variable-values='{"quote": "Schneiden ist *Weglassen*, nicht Hinzufügen.", "author": "Schnitt-Regel Nr. 1", "duration": 5}'></div>
+      <video id="v-a" class="clip edit-full" style="z-index:1" src="media/broll.mp4" muted data-start="22" data-duration="6" data-media-start="0" data-track-index="0"></video>
+      <div id="s06-lower-third" class="layer" style="z-index:10" data-composition-id="s06-lower-third" data-composition-src="compositions/lower-third.html" data-start="22.5" data-duration="5" data-track-index="2" data-variable-values='{"name": "Dein Name", "role": "Rolle · Firma", "duration": 5}'></div>
+      <div id="s07-callout" class="layer" style="z-index:10" data-composition-id="s07-callout" data-composition-src="compositions/callout.html" data-start="24.5" data-duration="3" data-track-index="3" data-variable-values='{"text": "Genau hier", "x": 62, "y": 38, "duration": 3}'></div>
+      <div id="s07b-callout" class="layer" style="z-index:10" data-composition-id="s07b-callout" data-composition-src="compositions/callout.html" data-start="25.3" data-duration="2.2" data-track-index="3" data-variable-values='{"text": "Und hier", "x": 40, "y": 62, "duration": 2.2, "side": "left"}'></div>
+      <video id="v-b" class="clip edit-screen" style="z-index:2" src="media/broll.mp4" muted data-start="28" data-duration="6" data-media-start="4" data-track-index="0"></video>
+      <div id="s08-screen-frame" class="layer" style="z-index:3" data-composition-id="s08-screen-frame" data-composition-src="compositions/screen-frame.html" data-start="28" data-duration="6" data-track-index="4" data-variable-values='{"label": "claude.ai/code", "duration": 6}'></div>
+      <video id="v-c" class="clip edit-split-a" style="z-index:1" src="media/broll.mp4" muted data-start="34" data-duration="6" data-media-start="1" data-track-index="0"></video>
+      <video id="v-d" class="clip edit-split-b" style="z-index:1" src="media/broll.mp4" muted data-start="34" data-duration="6" data-media-start="12" data-track-index="1"></video>
+      <div id="s09-split-screen" class="layer" style="z-index:10" data-composition-id="s09-split-screen" data-composition-src="compositions/split-screen.html" data-start="34" data-duration="6" data-track-index="5" data-variable-values='{"labelA": "Vorher", "labelB": "Nachher", "duration": 6}'></div>
+      <video id="v-e" class="clip edit-full" style="z-index:1" src="media/broll.mp4" muted data-start="40" data-duration="5" data-media-start="8" data-track-index="0"></video>
+      <video id="v-f" class="clip edit-pip" style="z-index:4" src="media/broll.mp4" muted data-start="40" data-duration="5" data-media-start="2" data-track-index="1"></video>
+      <div id="s10-pip" class="layer" style="z-index:10" data-composition-id="s10-pip" data-composition-src="compositions/pip.html" data-start="40" data-duration="5" data-track-index="6" data-variable-values='{"label": "Live", "corner": "br", "duration": 5}'></div>
+      <div id="s11-end-card" class="layer" style="z-index:10" data-composition-id="s11-end-card" data-composition-src="compositions/end-card.html" data-start="45" data-duration="5" data-track-index="7" data-variable-values='{"headline": "Mehr davon? *Abonnieren.*", "cta": "Nächstes Video ansehen", "handle": "@deinkanal", "duration": 5}'></div>
+      <audio id="voice" src="media/voice.mp3" data-start="22" data-duration="23" data-track-index="8"></audio>
+
+      <div id="captions-main" class="layer" data-composition-id="captions-main" style="z-index:50" data-composition-src="compositions/captions.html" data-start="0" data-duration="50" data-variable-values='{"offset":22}' data-track-index="9"></div>
+    </div>
+    <script>
+      window.__timelines = window.__timelines || {};
+      window.__timelines["main"] = gsap.timeline({ paused: true });
+    </script>
+  </body>
+</html>

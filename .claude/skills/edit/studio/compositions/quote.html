@@ -1,0 +1,54 @@
+<!doctype html>
+<!-- edit skill scene template: quote. Colors/fonts: ../brand/brand.css. Do not hard-code either here. -->
+<html lang="de" data-composition-variables='[{"id": "quote", "type": "string", "label": "Zitat, *Sternchen* = Akzent", "default": "Schneiden ist *Weglassen*, nicht Hinzufügen."}, {"id": "author", "type": "string", "label": "Von wem", "default": "Walter Murch"}, {"id": "bg", "type": "string", "label": "solid = Vollbild-Karte, overlay = über Footage", "default": "solid"}, {"id": "duration", "type": "number", "label": "Länge in Sekunden (= data-duration am Host)", "default": 5}]'>
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="stylesheet" href="../brand/brand.css" />
+    <link rel="stylesheet" href="../brand/edit.css" />
+    <script src="../brand/gsap.min.js"></script>
+    <script src="../brand/edit.js"></script>
+    <style>
+      .box { position: absolute; left: var(--pad-x); right: var(--pad-x); top: 50%; transform: translateY(-50%); }
+      .mark { font-size: calc(var(--u) * 360); color: var(--accent); line-height: 0.7; height: calc(var(--u) * 150); overflow: hidden; }
+      .mark span { display: inline-block; }
+      .q { font-size: calc(var(--u) * 128); max-width: 22ch; }
+      .by { display: flex; align-items: center; gap: calc(var(--u) * 22); margin-top: calc(var(--u) * 44); }
+      .by .rule { width: calc(var(--u) * 72); height: calc(var(--u) * 6); }
+      @media (orientation: portrait) { .q { font-size: calc(var(--u) * 122); max-width: 13ch; } }
+    </style>
+  </head>
+  <body>
+    <!-- data-duration is a ceiling; the host element's data-duration decides the real length -->
+    <div id="root" data-composition-id="quote" data-width="1920" data-height="1080" data-start="0" data-duration="3600">
+      <div class="scene">
+      <div class="box">
+        <div class="display mark"><span>&#8220;</span></div>
+        <div class="display q"></div>
+        <div class="by"><div class="rule"></div><div class="label author"></div></div>
+      </div>
+      </div>
+    </div>
+    <script>
+      // HyperFrames scopes document / gsap / __hyperframes per instance in THIS inline script only,
+      // so variables, the scene node and the timeline are fetched here and handed to the shared helper.
+      (function () {
+        var tl = gsap.timeline({ paused: true });
+        EDIT.scene(window.__hyperframes.getVariables(), document.querySelector(".scene"), tl, function (v, tl, dur, q, root) {
+        root.classList.add(v.bg === "overlay" ? "scrim" : "solid");
+        var qe = q(".q"), len = String(v.quote).length;
+        if (len > 60) qe.style.fontSize = "calc(var(--u) * " + Math.round(128 * Math.sqrt(60 / len)) + ")";
+        q(".author").textContent = v.author || "";
+        if (!v.author) q(".by").style.display = "none";
+        var w = EDIT.words(qe, v.quote);
+        tl.fromTo(q(".mark span"), { yPercent: 100 }, { yPercent: 0, duration: 0.6, ease: EDIT.EASE }, 0.05);
+        EDIT.rise(tl, w, 0.25, 0.045);
+        var after = 0.25 + w.length * 0.045 + 0.3;
+        tl.fromTo(q(".by .rule"), { scaleX: 0 }, { scaleX: 1, duration: 0.4, ease: EDIT.EASE }, after);
+        tl.fromTo(q(".author"), { opacity: 0, x: -14 }, { opacity: 1, x: 0, duration: 0.4, ease: "power3.out" }, after + 0.1);
+        EDIT.out(tl, q(".box"), dur);
+        });
+        window.__timelines["quote"] = tl;
+      })();
+    </script>
+  </body>
+</html>

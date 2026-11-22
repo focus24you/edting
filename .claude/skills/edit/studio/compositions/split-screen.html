@@ -1,0 +1,50 @@
+<!doctype html>
+<!-- edit skill scene template: split-screen. Colors/fonts: ../brand/brand.css. Do not hard-code either here. -->
+<html lang="de" data-composition-variables='[{"id": "labelA", "type": "string", "label": "Label linke/obere Hälfte", "default": "Vorher"}, {"id": "labelB", "type": "string", "label": "Label rechte/untere Hälfte", "default": "Nachher"}, {"id": "duration", "type": "number", "label": "Länge in Sekunden (= data-duration am Host)", "default": 4}]'>
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="stylesheet" href="../brand/brand.css" />
+    <link rel="stylesheet" href="../brand/edit.css" />
+    <script src="../brand/gsap.min.js"></script>
+    <script src="../brand/edit.js"></script>
+    <style>
+      /* Overlay for <video class="edit-split-a"> + <video class="edit-split-b"> in the host. */
+      .div { position: absolute; left: calc(50vw - var(--u) * 4); top: 0; width: calc(var(--u) * 8); height: 100vh; background: var(--accent); }
+      .tag { position: absolute; top: var(--pad-y); background: var(--bg); color: var(--text); font-size: calc(var(--u) * 60); padding: calc(var(--u) * 14) calc(var(--u) * 24) calc(var(--u) * 6); line-height: 1; border-left: calc(var(--u) * 10) solid var(--accent); }
+      .a { left: var(--pad-x); }
+      .b { left: calc(50vw + var(--pad-x)); }
+      @media (orientation: portrait) {
+        .div { left: 0; top: calc(50vh - var(--u) * 4); width: 100vw; height: calc(var(--u) * 8); }
+        .tag { left: var(--pad-x); }
+        .b { top: calc(50vh + var(--u) * 40); }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- data-duration is a ceiling; the host element's data-duration decides the real length -->
+    <div id="root" data-composition-id="split-screen" data-width="1920" data-height="1080" data-start="0" data-duration="3600">
+      <div class="scene">
+      <div class="div"></div>
+      <div class="display tag a"></div>
+      <div class="display tag b"></div>
+      </div>
+    </div>
+    <script>
+      // HyperFrames scopes document / gsap / __hyperframes per instance in THIS inline script only,
+      // so variables, the scene node and the timeline are fetched here and handed to the shared helper.
+      (function () {
+        var tl = gsap.timeline({ paused: true });
+        EDIT.scene(window.__hyperframes.getVariables(), document.querySelector(".scene"), tl, function (v, tl, dur, q, root) {
+        q(".a").textContent = v.labelA || ""; q(".b").textContent = v.labelB || "";
+        if (!v.labelA) q(".a").style.display = "none";
+        if (!v.labelB) q(".b").style.display = "none";
+        tl.fromTo(q(".div"), { scale: 0 }, { scale: 1, duration: 0.6, ease: EDIT.EASE }, 0);
+        tl.fromTo(q(".a"), { clipPath: "inset(0 100% 0 0)" }, { clipPath: "inset(0 0% 0 0)", duration: 0.45, ease: EDIT.EASE }, 0.3);
+        tl.fromTo(q(".b"), { clipPath: "inset(0 100% 0 0)" }, { clipPath: "inset(0 0% 0 0)", duration: 0.45, ease: EDIT.EASE }, 0.42);
+        tl.to([q(".a"), q(".b")], { opacity: 0, duration: 0.25 }, dur - 0.3);
+        });
+        window.__timelines["split-screen"] = tl;
+      })();
+    </script>
+  </body>
+</html>

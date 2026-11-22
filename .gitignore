@@ -16,3 +16,5 @@ projects/*/renders/
 !**/.gitkeep
 .DS_Store
 cookies.txt
+.hyperframes/
+projects/*/media/*
