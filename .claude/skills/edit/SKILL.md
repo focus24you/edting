@@ -44,12 +44,14 @@ Fehlt `.venv/` oder `node_modules/` (frischer Container): zuerst `bash scripts/s
    ffmpeg -i in.mp4 -filter_complex "[0:v]trim=2.1:9.4,setpts=PTS-STARTPTS[v0];[0:a]atrim=2.1:9.4,asetpts=PTS-STARTPTS[a0];[0:v]trim=12:20.5,setpts=PTS-STARTPTS[v1];[0:a]atrim=12:20.5,asetpts=PTS-STARTPTS[a1];[v0][a0][v1][a1]concat=n=2:v=1:a=1[v][a]" -map "[v]" -map "[a]" -c:v libx264 -crf 17 -c:a aac -b:a 192k raw/footage/cut.mp4
    ```
    Danach **den Schnitt neu transkribieren**; alle Zeiten ab hier beziehen sich auf `cut.mp4`.
-4. **Projekt anlegen.** `bash SK/scripts/new-project.sh <name> landscape|portrait raw/footage/cut.mp4`
-   kopiert Marke und Templates nach `projects/<name>/` und schreibt `index.html` mit dem Video und der Caption-Spur.
-5. **Captions.** `python3 SK/scripts/captions.py transcripts/cut.json projects/<name>`
-   (`--max-words 3`; Hochformat eher 2). Whisper-Fehler direkt in `captions-data.js` korrigieren.
-6. **Szenen setzen.** Aus dem Transkript ableiten, wo welche Szene hilft, und Snippets
-   (Katalog unten) bei `<!-- SCENES -->` in `index.html` einfügen. Zeiten aus den Wort-Zeitstempeln nehmen.
+4. **Projekt anlegen.** `node studio/cli.mjs new <name> landscape|portrait raw/footage/cut.mp4`
+   kopiert Marke und Templates nach `projects/<name>/` und schreibt `studio.json`.
+5. **Captions.** `node studio/cli.mjs captions <name> transcripts/cut.json [maxWords]`
+   (Hochformat eher 2). Whisper-Fehler in `studio.json` unter `captions.groups` korrigieren.
+6. **Szenen setzen.** Aus dem Transkript ableiten, wo welche Szene hilft, und in
+   `studio.json` unter `scenes` eintragen (Format unten), dann `node studio/cli.mjs build <name>`.
+   `index.html` und `captions-data.js` sind **generiert**: nie von Hand ändern, sonst
+   überschreibt sie der nächste Build bzw. die Studio-Oberfläche.
 7. **Prüfen.** Im Projektordner: `npx --prefix ../.. hyperframes check`, dann
    `npx --prefix ../.. hyperframes snapshot --at <sekunden>` für jede Szene (einmal mitten in der
    Animation, einmal im Stand) und die Bilder ansehen. Erst danach rendern.
@@ -58,13 +60,17 @@ Fehlt `.venv/` oder `node_modules/` (frischer Container): zuerst `bash scripts/s
 
 ## Szenen-Katalog
 
-Jede Szene ist eine Zeile im Host. `ID` pro Instanz eindeutig, `duration` in den Variablen
-**muss gleich `data-duration` sein** (steuert die Ausblendung). `bg`: `solid` = Vollbild-Karte,
-`overlay` = abgedunkelt über Footage.
+Ein Eintrag in `scenes` von `studio.json` (spätere Einträge liegen oben):
 
-```html
-<div id="ID" class="layer" style="z-index:10" data-composition-id="ID" data-composition-src="compositions/TEMPLATE.html" data-start="12.4" data-duration="4" data-track-index="2" data-variable-values='{"duration":4, ...}'></div>
+```json
+{ "template": "title-card", "start": 0, "duration": 3.5, "vars": { "kicker": "Neue Folge", "title": "So geht *das*", "bg": "solid" } }
+{ "template": "screen-frame", "start": 30, "duration": 6, "vars": { "label": "claude.ai" }, "media": ["screen.mp4"], "mediaStart": 0 }
 ```
+
+`media` sind Dateinamen in `projects/<name>/media/` (`split-screen` braucht zwei; `b-roll` ist ein
+vollflächiges Video ohne Template). `bg`: `solid` = Vollbild-Karte, `overlay` = abgedunkelt über Footage.
+Dieselbe Datei bearbeitet die Studio-Oberfläche (`npm run studio`, http://localhost:4747); der Nutzer
+kann dort weiterarbeiten, was hier angelegt wurde, und umgekehrt.
 
 | Template | Wofür | Variablen (außer `duration`) | Länge |
 |---|---|---|---|
@@ -81,31 +87,13 @@ Jede Szene ist eine Zeile im Host. `ID` pro Instanz eindeutig, `duration` in den
 | `pip` | Label zum Bild-im-Bild | `label`, `corner` br/bl/tr/tl | beliebig |
 | `end-card` | Schluss mit Call-to-Action | `headline` (`*Akzent*`), `cta`, `handle`, `bg` | 4-6 s |
 
-Szenen mit eigenem Video: das `<video>` steht im **Host** und bekommt eine Klasse aus `brand/edit.css`;
-das Template liegt darüber (höherer `z-index`).
-
-```html
-<!-- screen-frame: Template malt Hintergrund + Fenster, das Video scheint durch -->
-<video id="scr1" class="clip edit-screen" style="z-index:2" src="media/screen.mp4" muted data-start="30" data-duration="6" data-media-start="0" data-track-index="1"></video>
-<div id="s-scr1" class="layer" style="z-index:3" data-composition-id="s-scr1" data-composition-src="compositions/screen-frame.html" data-start="30" data-duration="6" data-variable-values='{"duration":6,"label":"claude.ai"}'></div>
-
-<!-- split-screen -->
-<video id="spa" class="clip edit-split-a" src="media/a.mp4" muted data-start="40" data-duration="6" data-track-index="1"></video>
-<video id="spb" class="clip edit-split-b" src="media/b.mp4" muted data-start="40" data-duration="6" data-track-index="2"></video>
-<div id="s-sp" class="layer" style="z-index:3" data-composition-id="s-sp" data-composition-src="compositions/split-screen.html" data-start="40" data-duration="6" data-variable-values='{"duration":6,"labelA":"Vorher","labelB":"Nachher"}'></div>
-
-<!-- pip: Klassen left / top / round am Video verschieben bzw. runden es; corner passend setzen -->
-<video id="pip1" class="clip edit-pip" style="z-index:4" src="media/cam.mp4" muted data-start="50" data-duration="8" data-track-index="2"></video>
-<div id="s-pip1" class="layer" style="z-index:5" data-composition-id="s-pip1" data-composition-src="compositions/pip.html" data-start="50" data-duration="8" data-variable-values='{"duration":8,"label":"Live","corner":"br"}'></div>
-```
-
-B-Roll vollflächig: `<video class="clip edit-full" muted ...>`. Ton nur am Hauptvideo
-(`data-has-audio="true"`); Musik als `<audio>` mit `data-volume="0.15"`.
+Der Build setzt daraus die Host-Elemente: Szenen mit eigenem Video bekommen ein `<video>` mit
+einer Klasse aus `brand/edit.css` (`edit-screen`, `edit-split-a/b`, `edit-pip`, `edit-full`), das Template liegt darüber.
 
 ## Regeln beim Setzen
 
-- Captions laufen über allem (`z-index:50`). Während Vollbild-Karten (`bg: solid`) mit eigenem
-  Text die betroffenen Gruppen aus `captions-data.js` nehmen oder die Karte so legen, dass nichts kollidiert.
+- Captions laufen über allem. Mit `captions.hideOnCards: true` (Standard) blendet der Build sie
+  während Vollbild-Karten automatisch aus.
 - Nie zwei Text-Szenen gleichzeitig, außer `lower-third` + `callout`.
 - `callout`: `side` so wählen, dass das Label ins Bild passt (Punkt rechts der Mitte: `left`).
 - `list` mit `times`: Einblendzeiten relativ zum Szenenstart auf die Stelle legen, an der der Punkt gesprochen wird.
@@ -127,8 +115,9 @@ Ein vorhandenes Template in `SK/studio/compositions/` kopieren und anpassen. Was
 - Variablen in `data-composition-variables` am `<html>` deklarieren (mit Default), danach Template
   auch in den Katalog oben eintragen und mit `snapshot` in Quer- und Hochformat prüfen.
 
-`projects/_showcase/` zeigt alle 12 Szenen in einer Timeline (Medien liegen nicht im Git;
-eigenes `media/broll.mp4` + `media/voice.mp3` einlegen, um es neu zu rendern).
+Neues Template zusätzlich in `TEMPLATE_INFO` in `studio/core.mjs` eintragen, dann erscheint es
+auch in der Studio-Oberfläche. `projects/_showcase/` zeigt alle 12 Szenen in einer handgeschriebenen
+Timeline (Medien liegen nicht im Git).
 
 ## Geschmack
 

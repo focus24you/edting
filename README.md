@@ -1,5 +1,16 @@
 # Edit studio
 
+## Studio UI
+
+```bash
+bash scripts/setup.sh   # once
+npm run studio          # then open http://localhost:4747
+```
+
+Drop a video (or paste a link): it is normalized, optionally silence-trimmed, transcribed and
+captioned. Then place scenes on the timeline, fix caption words, render a draft or final MP4.
+Everything stays on your machine; the server only listens on localhost.
+
 A Claude Code video editing studio.
 
 | Tool | Job | Run |

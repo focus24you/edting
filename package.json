@@ -4,9 +4,11 @@
   "description": "Video editing studio: Whisper + yt-dlp + HyperFrames + ffmpeg",
   "scripts": {
     "setup": "bash scripts/setup.sh",
-    "doctor": "bash scripts/doctor.sh"
+    "doctor": "bash scripts/doctor.sh",
+    "studio": "node studio/server.mjs"
   },
   "dependencies": {
     "hyperframes": "^0.9.82"
-  }
+  },
+  "type": "commonjs"
 }
