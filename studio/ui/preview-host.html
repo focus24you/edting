@@ -1,0 +1,79 @@
+<!doctype html>
+<!-- Live preview film: runs inside the editor's player at the film's real pixel size (scaled by CSS).
+     Media scenes are <video> elements with the brand layout classes; template scenes are nested
+     iframes whose GSAP timeline is seeked to the playhead. Mirrors what studio/core.mjs build() emits. -->
+<html lang="de">
+  <head>
+    <meta charset="UTF-8" />
+    <script>
+      const id = location.pathname.split("/")[2];
+      for (const f of ["brand.css", "edit.css"]) document.write(`<link rel="stylesheet" href="/files/projects/${id}/brand/${f}" />`);
+    </script>
+    <style>
+      html, body { background: transparent !important; }
+      iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; background: transparent; }
+      video, iframe { visibility: hidden; }
+    </style>
+  </head>
+  <body>
+    <script>
+      const TEMPLATED = (t) => t !== "b-roll";
+      let last = [0, false];
+      let items = []; // one per scene: { key, s, frame, vids: [el] }
+      function make(s, i) {
+        const z = 10 + i * 4, it = { s, vids: [], frame: null };
+        const vid = (cls, file) => {
+          const v = document.createElement("video");
+          v.className = cls; v.style.zIndex = z; v.muted = true; v.playsInline = true; v.preload = "auto";
+          v.src = `/files/projects/${id}/media/${encodeURIComponent(file)}`;
+          document.body.append(v); it.vids.push(v);
+        };
+        const m = s.media || [], c = String(s.vars?.corner || "br");
+        if (s.template === "b-roll" && m[0]) vid("edit-full", m[0]);
+        if (s.template === "screen-frame" && m[0]) vid("edit-screen", m[0]);
+        if (s.template === "split-screen" && m[0] && m[1]) { vid("edit-split-a", m[0]); vid("edit-split-b", m[1]); }
+        if (s.template === "pip" && m[0]) vid("edit-pip" + (c.includes("l") ? " left" : "") + (c[0] === "t" ? " top" : ""), m[0]);
+        const needsMedia = s.needs > 0 && it.vids.length < s.needs;
+        if (TEMPLATED(s.template) && !needsMedia) {
+          const f = document.createElement("iframe");
+          f.style.zIndex = z + 1;
+          f.src = `/preview/${id}/scene/${s.template}?d=${s.duration}&v=${encodeURIComponent(JSON.stringify(s.vars || {}))}`;
+          f.onload = () => window.seek(last[0], last[1]); // paused editor: show the scene as soon as it exists
+          document.body.append(f); it.frame = f;
+        }
+        return it;
+      }
+      const drop = (it) => { it.vids.forEach((v) => v.remove()); it.frame?.remove(); };
+      // Rebuild only the scenes whose content changed; moving a scene in time rebuilds nothing.
+      window.setScenes = function (list) {
+        const next = list.map((s, i) => {
+          const key = JSON.stringify([s.template, s.vars, s.duration, s.media, i]), old = items[i];
+          if (old && old.key === key) { old.s = s; return old; }
+          if (old) drop(old);
+          const it = make(s, i); it.key = key; return it;
+        });
+        items.slice(list.length).forEach(drop);
+        items = next;
+      };
+      window.seek = function (t, playing) {
+        last = [t, playing];
+        for (const it of items) {
+          const local = t - it.s.start, on = local >= 0 && local < it.s.duration;
+          for (const v of it.vids) {
+            v.style.visibility = on ? "visible" : "hidden";
+            if (!on) { if (!v.paused) v.pause(); continue; }
+            const want = (it.s.mediaStart || 0) + local;
+            if (Math.abs(v.currentTime - want) > (playing ? 0.35 : 0.04)) v.currentTime = want;
+            if (playing && v.paused) v.play().catch(() => {}); else if (!playing && !v.paused) v.pause();
+          }
+          if (it.frame) {
+            const tl = on && it.frame.contentWindow?.__timelines?.[it.s.template];
+            it.frame.style.visibility = tl ? "visible" : "hidden"; // stays hidden until its timeline exists
+            if (tl) tl.time(local);
+          }
+        }
+      };
+      parent.postMessage("preview-ready", location.origin);
+    </script>
+  </body>
+</html>

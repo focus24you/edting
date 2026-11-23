@@ -118,6 +118,16 @@ export function wordsFromWhisper(json) {
   return (json.segments || []).flatMap((s) => s.words || []);
 }
 
+/** Declared defaults + the scene's own values, typed, plus the duration the template fades out on. */
+export function sceneVars(def, vars, duration) {
+  const v = { duration };
+  for (const dv of def.vars) {
+    let val = vars?.[dv.id]; if (val === undefined || val === null) val = dv.default;
+    v[dv.id] = dv.type === "number" ? Number(val) || 0 : String(val);
+  }
+  return v;
+}
+
 const attr = (o) => JSON.stringify(o).replace(/&/g, "&amp;").replace(/'/g, "&#39;");
 const SOLID = new Set(["title-card", "chapter-card", "list", "stat", "quote", "end-card", "screen-frame"]);
 
@@ -140,11 +150,7 @@ export function build(p) {
     const def = tdefs[s.template]; if (!def) return;
     const start = +Math.max(0, Math.min(+s.start, dur)).toFixed(2), d = +Math.min(+s.duration, dur - start).toFixed(2);
     if (d <= 0.2) return;
-    const z = 10 + i * 4, id = `sc${i + 1}-${s.template}`, v = { duration: d };
-    for (const dv of def.vars) {
-      let val = s.vars?.[dv.id]; if (val === undefined || val === null) val = dv.default;
-      v[dv.id] = dv.type === "number" ? Number(val) || 0 : String(val);
-    }
+    const z = 10 + i * 4, id = `sc${i + 1}-${s.template}`, v = sceneVars(def, s.vars, d);
     const m = s.media || [], ms = +s.mediaStart || 0;
     if (def.media && !m[0]) return; // media scene without a file: skip instead of rendering a hole
     if (s.template === "b-roll") { L.push(video(id, "edit-full", start, d, m[0], z, ms)); return; }

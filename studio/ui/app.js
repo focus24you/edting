@@ -28,6 +28,7 @@ const VIDEO = /\.(mp4|mov|m4v|webm|mkv|avi)$/i;
 let state = { projects: [], jobs: [] }, templates = [], view = null, uploads = [];
 const prefs = { shape: "auto", language: "auto", model: "small", cut: false };
 const OPTIONS = { bg: [["solid", "Vollbild-Karte"], ["overlay", "Über dem Video"]], side: [["left", "Links"], ["right", "Rechts"]], corner: [["br", "Unten rechts"], ["bl", "Unten links"], ["tr", "Oben rechts"], ["tl", "Oben links"]] };
+const SOLID = new Set(["title-card", "chapter-card", "list", "stat", "quote", "end-card", "screen-frame"]);
 const LONG = new Set(["title", "quote", "items", "headline"]);
 
 // ------------------------------------------------------------------ importing
@@ -130,7 +131,18 @@ async function Editor(id) {
   const T = Object.fromEntries(templates.map((t) => [t.id, t]));
   let sel = -1, tab = "scenes", zoom = 1, saveTimer, snapAt = null, picking = false;
 
-  const save = () => { clearTimeout(saveTimer); saveTimer = setTimeout(() => api("projects/" + id, { method: "PUT", json: { title: p.title, scenes: p.scenes, captions: p.captions } }).catch((e) => toast(e.message)), 400); };
+  const [FW, FH] = p.shape === "portrait" ? [1080, 1920] : [1920, 1080];
+  const pv = h("iframe", { class: "pv", src: `/preview/${id}/host`, width: FW, height: FH, tabindex: "-1" });
+  let pvReady = false;
+  // the preview film gets the same clamped scenes the build would render
+  const syncPreview = () => { if (!pvReady) return; pv.contentWindow.setScenes(p.scenes.map((s) => {
+    const start = Math.max(0, Math.min(s.start, p.duration)), duration = +Math.min(s.duration, p.duration - start).toFixed(2);
+    return { template: s.template, start, duration, vars: s.vars, media: s.media, mediaStart: s.mediaStart, needs: T[s.template]?.media || 0 };
+  }).filter((s) => s.duration > 0.2)); tick(); };
+  const onMsg = (e) => { if (e.source === pv.contentWindow && e.data === "preview-ready") { pvReady = true; syncPreview(); } };
+  addEventListener("message", onMsg);
+  let syncTimer; const syncSoon = () => { clearTimeout(syncTimer); syncTimer = setTimeout(syncPreview, 250); };
+  const save = () => { syncSoon(); clearTimeout(saveTimer); saveTimer = setTimeout(() => api("projects/" + id, { method: "PUT", json: { title: p.title, scenes: p.scenes, captions: p.captions } }).catch((e) => toast(e.message)), 400); };
   const flush = async () => { clearTimeout(saveTimer); await api("projects/" + id, { method: "PUT", json: { title: p.title, scenes: p.scenes, captions: p.captions } }); };
 
   $("#crumbs").replaceChildren(h("a", { class: "btn ghost sm", href: "#/" }, "← Projekte"), h("input", { value: p.title, oninput: (e) => { p.title = e.target.value; save(); } }));
@@ -138,14 +150,15 @@ async function Editor(id) {
   // ---- stage
   const video = h("video", { src: p.hasVideo ? `/files/projects/${id}/media/main.mp4` : null, playsinline: true, preload: "auto" });
   const cap = h("div", { class: "cap" }), chip = h("div", { class: "chip", style: "display:none" }), snap = h("img", { class: "snap", style: "display:none" }), pin = h("div", { class: "pin", style: "display:none" });
-  const stage = h("div", { class: "stage " + p.shape }, video, cap, snap, chip, pin);
+  const stage = h("div", { class: "stage " + p.shape }, video, pv, cap, snap, chip, pin);
+  const fit = new ResizeObserver(() => { pv.style.transform = `scale(${stage.clientWidth / FW})`; }); fit.observe(stage);
   const playBtn = h("button", { class: "play", title: "Abspielen (Leertaste)", onclick: () => (video.paused ? video.play() : video.pause()) }, "▶");
   const time = h("span", { class: "time" });
   const dl = h("a", { class: "btn", href: `/files/exports/${id}.mp4?download`, style: p.export ? "" : "display:none" }, "↓ Video speichern");
   const busy = () => state.jobs.some((j) => j.project === id && (j.status === "running" || j.status === "queued"));
   const start = async (path, msg) => { if (busy()) return toast("Es läuft schon ein Auftrag für dieses Projekt."); try { await flush(); await api(`projects/${id}/${path}`, { method: "POST" }); toast(msg); poll(); } catch (e) { toast(e.message); } };
   const transport = h("div", { class: "transport" }, playBtn, time,
-    h("button", { class: "btn", title: "Rendert das Bild an der Abspielposition exakt wie im fertigen Video", onclick: () => { snapAt = video.currentTime; start(`snapshot?t=${snapAt}`, "Vorschaubild wird gerendert"); } }, "Exaktes Vorschaubild"),
+    h("button", { class: "btn ghost", title: "Rendert das Bild an der Abspielposition mit dem echten Renderer, zur Kontrolle", onclick: () => { snapAt = video.currentTime; start(`snapshot?t=${snapAt}`, "Kontrollbild wird gerendert"); } }, "Kontrollbild"),
     h("span", { class: "sp" }),
     h("button", { class: "btn", onclick: () => start("render?quality=draft", "Entwurf wird gerendert") }, "Entwurf rendern"),
     h("button", { class: "btn primary", onclick: () => start("render", "Finales Video wird gerendert") }, "Final rendern"), dl);
@@ -154,7 +167,7 @@ async function Editor(id) {
     if (!picking || !s) return;
     const r = stage.getBoundingClientRect();
     s.vars.x = Math.round(((e.clientX - r.left) / r.width) * 100); s.vars.y = Math.round(((e.clientY - r.top) / r.height) * 100);
-    picking = false; save(); drawPanel(); tick();
+    picking = false; stage.classList.remove("picking"); save(); drawPanel(); tick();
   });
 
   // ---- timeline
@@ -184,6 +197,7 @@ async function Editor(id) {
           const dt = (ev.clientX - x0) / k; if (Math.abs(ev.clientX - x0) > 2) moved = true;
           if (resize) s.duration = +Math.max(0.5, Math.min(p.duration - s.start, d0 + dt)).toFixed(2);
           else s.start = +Math.max(0, Math.min(p.duration - s.duration, s0 + dt)).toFixed(2);
+          syncSoon();
           b.style.left = s.start * k + "px"; b.style.width = Math.max(10, s.duration * k) + "px";
         };
         const up = () => { b.removeEventListener("pointermove", move); b.removeEventListener("pointerup", up); sel = i; if (moved) save(); drawTimeline(); drawPanel(); tick(); };
@@ -210,15 +224,17 @@ async function Editor(id) {
     playBtn.textContent = video.paused ? "▶" : "❚❚";
     head.style.left = t * pps() + "px";
     const active = p.scenes.filter((s) => t >= s.start && t < s.start + s.duration);
-    const g = p.captions.enabled ? p.captions.groups.find((g) => t >= g.start && t < g.end) : null;
+    // same rule as the build: no captions while a full-screen card covers the picture
+    const covered = p.captions.hideOnCards && active.some((s) => SOLID.has(s.template) && (s.vars.bg ?? "solid") !== "overlay");
+    const g = p.captions.enabled && !covered ? p.captions.groups.find((g) => g.words.length && t >= g.start && t < g.end) : null;
     cap.className = "cap" + (p.captions.position === "center" ? " center" : "");
     if (g !== lastGroup) { lastGroup = g; cap.replaceChildren(...(g ? g.words.map((w) => h("span", {}, w.t)) : [])); }
     if (g) [...cap.children].forEach((el, i) => el.classList.toggle("on", t >= g.words[i].start && (i === g.words.length - 1 || t < g.words[i + 1].start)));
-    chip.style.display = active.length && snap.style.display === "none" ? "" : "none";
-    if (active.length) chip.replaceChildren(h("b", {}, active.map((s) => T[s.template]?.label).join(" + ")), "liegt hier · „Exaktes Vorschaubild“ zeigt es");
-    const s = p.scenes[sel];
-    pin.style.display = s?.template === "callout" && snap.style.display === "none" ? "" : "none";
-    if (s?.template === "callout") { pin.style.left = (s.vars.x ?? 50) + "%"; pin.style.top = (s.vars.y ?? 50) + "%"; }
+    if (pvReady) pv.contentWindow.seek(t, !video.paused);
+    const missing = active.filter((s) => (T[s.template]?.media || 0) > (s.media || []).filter(Boolean).length);
+    chip.style.display = missing.length && snap.style.display === "none" ? "" : "none";
+    if (missing.length) chip.replaceChildren(h("b", {}, missing.map((s) => T[s.template]?.label).join(" + ")), "braucht noch ein Video");
+    pin.style.display = "none";
     if (tab === "captions") document.querySelectorAll(".grp").forEach((el) => el.classList.toggle("now", +el.dataset.i === p.captions.groups.indexOf(g)));
   }
   let raf; const loop = () => { tick(); raf = requestAnimationFrame(loop); };
@@ -250,7 +266,7 @@ async function Editor(id) {
         if (LONG.has(v.id)) return field(label, h("textarea", { rows: 2, oninput: (e) => set(e.target.value) }, String(cur)));
         return field(label, h("input", { type: v.type === "number" ? "number" : "text", value: cur, oninput: (e) => set(e.target.value) }));
       }),
-      s.template === "callout" ? h("div", { class: "hint" }, h("button", { class: "btn sm", onclick: () => { picking = true; toast("Jetzt im Video auf die Stelle klicken"); } }, "Punkt im Video anklicken")) : null,
+      s.template === "callout" ? h("div", { class: "hint" }, h("button", { class: "btn sm", onclick: () => { picking = true; stage.classList.add("picking"); toast("Jetzt im Video auf die Stelle klicken"); } }, "Punkt im Video anklicken")) : null,
       h("div", { style: "display:flex;gap:8px;margin-top:6px" },
         h("button", { class: "btn sm", onclick: () => seek(s.start + Math.min(1.2, s.duration / 2)) }, "Hinspringen"),
         h("button", { class: "btn sm danger", onclick: () => { p.scenes.splice(sel, 1); sel = -1; save(); drawTimeline(); drawPanel(); } }, "Szene löschen")));
@@ -301,7 +317,7 @@ async function Editor(id) {
 
   return {
     type: "editor",
-    destroy() { removeEventListener("resize", onResize); removeEventListener("keydown", onKey); cancelAnimationFrame(raf); clearTimeout(saveTimer); video.pause(); },
+    destroy() { removeEventListener("message", onMsg); fit.disconnect(); clearTimeout(syncTimer); removeEventListener("resize", onResize); removeEventListener("keydown", onKey); cancelAnimationFrame(raf); clearTimeout(saveTimer); video.pause(); },
     onJob(j) {
       if (j.project !== id || j.status !== "done") return;
       if (j.type === "snapshot") { video.pause(); if (snapAt != null) video.currentTime = snapAt; snap.src = `/files/projects/${id}/media/preview.png?${j.result}`; snap.style.display = ""; tick(); }

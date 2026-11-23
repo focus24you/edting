@@ -238,6 +238,19 @@ const server = http.createServer(async (req, res) => {
       }
       return json(res, 404, { error: "unknown endpoint" });
     }
+    // ---- live preview: the same templates the render uses, driven by the editor's playhead
+    if (seg[0] === "preview" && seg[1]) {
+      const id = seg[1], dir = core.projectDir(id), html = (s) => { res.writeHead(200, { "content-type": MIME[".html"], "cache-control": "no-store" }); res.end(s); };
+      if (seg[2] === "host") return sendFile(req, res, path.join(UI, "preview-host.html"));
+      if (seg[2] === "scene") {
+        const def = core.templates().find((t) => t.id === seg[3]), file = path.join(dir, "compositions", seg[3] + ".html");
+        if (!def || !fs.existsSync(file)) return json(res, 404, { error: "unknown template" });
+        const vars = core.sceneVars(def, JSON.parse(q.get("v") || "{}"), +q.get("d") || def.dur);
+        // HyperFrames injects per-instance variables at render; here a small shim hands them to the template
+        const shim = `<base href="/files/projects/${id}/compositions/" /><script>window.__hyperframes = { getVariables: function () { return ${JSON.stringify(vars).replace(/</g, "\\u003c")}; } };</script>`;
+        return html(fs.readFileSync(file, "utf8").replace('<meta charset="UTF-8" />', '<meta charset="UTF-8" />' + shim));
+      }
+    }
     if (seg[0] === "files") {
       const base = seg[1] === "exports" ? core.EXPORTS : seg[1] === "projects" ? core.PROJECTS : seg[1] === "brand" ? path.join(core.SKEL, "brand") : null;
       const f = base && inside(base, seg.slice(2).join("/"));
