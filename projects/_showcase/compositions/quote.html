@@ -1,6 +1,6 @@
 <!doctype html>
 <!-- edit skill scene template: quote. Colors/fonts: ../brand/brand.css. Do not hard-code either here. -->
-<html lang="de" data-composition-variables='[{"id": "quote", "type": "string", "label": "Zitat, *Sternchen* = Akzent", "default": "Schneiden ist *Weglassen*, nicht Hinzufügen."}, {"id": "author", "type": "string", "label": "Von wem", "default": "Walter Murch"}, {"id": "bg", "type": "string", "label": "solid = Vollbild-Karte, overlay = über Footage", "default": "solid"}, {"id": "duration", "type": "number", "label": "Länge in Sekunden (= data-duration am Host)", "default": 5}]'>
+<html lang="de" data-composition-variables='[{"id": "quote", "type": "string", "label": "Zitat, *Sternchen* = Akzent", "default": "Schneiden ist *Weglassen*, nicht Hinzufügen."}, {"id": "author", "type": "string", "label": "Von wem", "default": "Walter Murch"}, {"id": "card", "type": "string", "label": "solid = Vollbild-Karte, overlay = über Footage", "default": "solid"}, {"id": "duration", "type": "number", "label": "Länge in Sekunden (= data-duration am Host)", "default": 5}]'>
   <head>
     <meta charset="UTF-8" />
     <link rel="stylesheet" href="../brand/brand.css" />
@@ -34,7 +34,7 @@
       (function () {
         var tl = gsap.timeline({ paused: true });
         EDIT.scene(window.__hyperframes.getVariables(), document.querySelector(".scene"), tl, function (v, tl, dur, q, root) {
-        root.classList.add(v.bg === "overlay" ? "scrim" : "solid");
+        root.classList.add(v.card === "overlay" ? "scrim" : "solid");
         var qe = q(".q"), len = String(v.quote).length;
         if (len > 60) qe.style.fontSize = "calc(var(--u) * " + Math.round(128 * Math.sqrt(60 / len)) + ")";
         q(".author").textContent = v.author || "";

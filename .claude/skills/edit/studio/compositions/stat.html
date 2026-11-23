@@ -1,6 +1,6 @@
 <!doctype html>
 <!-- edit skill scene template: stat. Colors/fonts: ../brand/brand.css. Do not hard-code either here. -->
-<html lang="de" data-composition-variables='[{"id": "value", "type": "number", "label": "Zielzahl", "default": 87}, {"id": "decimals", "type": "number", "label": "Nachkommastellen", "default": 0}, {"id": "prefix", "type": "string", "label": "Vor der Zahl", "default": ""}, {"id": "suffix", "type": "string", "label": "Nach der Zahl", "default": "%"}, {"id": "label", "type": "string", "label": "Erklärzeile", "default": "weniger Zeit im Schnitt"}, {"id": "locale", "type": "string", "label": "Zahlenformat", "default": "de-DE"}, {"id": "bg", "type": "string", "label": "solid = Vollbild-Karte, overlay = über Footage", "default": "solid"}, {"id": "duration", "type": "number", "label": "Länge in Sekunden (= data-duration am Host)", "default": 4}]'>
+<html lang="de" data-composition-variables='[{"id": "value", "type": "number", "label": "Zielzahl", "default": 87}, {"id": "decimals", "type": "number", "label": "Nachkommastellen", "default": 0}, {"id": "prefix", "type": "string", "label": "Vor der Zahl", "default": ""}, {"id": "suffix", "type": "string", "label": "Nach der Zahl", "default": "%"}, {"id": "label", "type": "string", "label": "Erklärzeile", "default": "weniger Zeit im Schnitt"}, {"id": "locale", "type": "string", "label": "Zahlenformat", "default": "de-DE"}, {"id": "card", "type": "string", "label": "solid = Vollbild-Karte, overlay = über Footage", "default": "solid"}, {"id": "duration", "type": "number", "label": "Länge in Sekunden (= data-duration am Host)", "default": 4}]'>
   <head>
     <meta charset="UTF-8" />
     <link rel="stylesheet" href="../brand/brand.css" />
@@ -33,7 +33,7 @@
       (function () {
         var tl = gsap.timeline({ paused: true });
         EDIT.scene(window.__hyperframes.getVariables(), document.querySelector(".scene"), tl, function (v, tl, dur, q, root) {
-        root.classList.add(v.bg === "overlay" ? "scrim" : "solid");
+        root.classList.add(v.card === "overlay" ? "scrim" : "solid");
         var dec = Number(v.decimals) || 0, target = Number(v.value) || 0, val = q(".val"), o = { n: 0 };
         function show() { val.textContent = o.n.toLocaleString(v.locale || "de-DE", { minimumFractionDigits: dec, maximumFractionDigits: dec }); }
         q(".pre").textContent = v.prefix || ""; q(".suf").textContent = v.suffix || ""; q(".lab").textContent = v.label || "";

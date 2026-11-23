@@ -63,29 +63,29 @@ Fehlt `.venv/` oder `node_modules/` (frischer Container): zuerst `bash scripts/s
 Ein Eintrag in `scenes` von `studio.json` (spätere Einträge liegen oben):
 
 ```json
-{ "template": "title-card", "start": 0, "duration": 3.5, "vars": { "kicker": "Neue Folge", "title": "So geht *das*", "bg": "solid" } }
+{ "template": "title-card", "start": 0, "duration": 3.5, "vars": { "kicker": "Neue Folge", "title": "So geht *das*", "card": "solid" } }
 { "template": "screen-frame", "start": 30, "duration": 6, "vars": { "label": "claude.ai" }, "media": ["screen.mp4"], "mediaStart": 0 }
 ```
 
 `media` sind Dateinamen in `projects/<name>/media/` (`split-screen` braucht zwei; `b-roll` ist ein
-vollflächiges Video ohne Template). `bg`: `solid` = Vollbild-Karte, `overlay` = abgedunkelt über Footage.
+vollflächiges Video ohne Template). `card`: `solid` = Vollbild-Karte, `overlay` = abgedunkelt über Footage.
 Dieselbe Datei bearbeitet die Studio-Oberfläche (`npm run studio`, http://localhost:4747); der Nutzer
 kann dort weiterarbeiten, was hier angelegt wurde, und umgekehrt.
 
 | Template | Wofür | Variablen (außer `duration`) | Länge |
 |---|---|---|---|
 | `captions` | Wort-für-Wort-Untertitel, aktives Wort in Akzent | `position` bottom/center, `offset` | ganzes Video |
-| `title-card` | Hook / Titel am Anfang | `kicker`, `title` (`*Akzent*`), `bg` | 3-4 s |
-| `chapter-card` | Kapitelwechsel | `number`, `title`, `bg` | 2-3 s |
+| `title-card` | Hook / Titel am Anfang | `kicker`, `title` (`*Akzent*`), `card` | 3-4 s |
+| `chapter-card` | Kapitelwechsel | `number`, `title`, `card` | 2-3 s |
 | `lower-third` | Name + Rolle | `name`, `role`, `side` left/right | 4-6 s |
-| `callout` | Stichwort mit Zeiger auf einen Bildpunkt | `text`, `x`, `y` (% des Bilds), `side` | 2-4 s |
-| `list` | Schritte / Aufzählung | `title`, `items` (`a\|b\|c`), `times` (`1.2\|3.4\|...` optional), `bg` | 1,5 s + 1,5 s je Punkt |
-| `stat` | Große Zahl zählt hoch | `value`, `decimals`, `prefix`, `suffix`, `label`, `bg` | 3-5 s |
-| `quote` | Zitat | `quote` (`*Akzent*`), `author`, `bg` | 4-6 s |
+| `callout` | Stichwort mit Zeiger auf einen Bildpunkt | `word`, `x`, `y` (% des Bilds), `side` | 2-4 s |
+| `list` | Schritte / Aufzählung | `title`, `items` (`a\|b\|c`), `times` (`1.2\|3.4\|...` optional), `card` | 1,5 s + 1,5 s je Punkt |
+| `stat` | Große Zahl zählt hoch | `value`, `decimals`, `prefix`, `suffix`, `label`, `card` | 3-5 s |
+| `quote` | Zitat | `quote` (`*Akzent*`), `author`, `card` | 4-6 s |
 | `screen-frame` | Bildschirmaufnahme im Fenster | `label`, `title` (nur Hochformat sichtbar) | beliebig |
 | `split-screen` | Zwei Videos nebeneinander (hoch: übereinander) | `labelA`, `labelB` | beliebig |
 | `pip` | Label zum Bild-im-Bild | `label`, `corner` br/bl/tr/tl | beliebig |
-| `end-card` | Schluss mit Call-to-Action | `headline` (`*Akzent*`), `cta`, `handle`, `bg` | 4-6 s |
+| `end-card` | Schluss mit Call-to-Action | `headline` (`*Akzent*`), `cta`, `handle`, `card` | 4-6 s |
 
 Der Build setzt daraus die Host-Elemente: Szenen mit eigenem Video bekommen ein `<video>` mit
 einer Klasse aus `brand/edit.css` (`edit-screen`, `edit-split-a/b`, `edit-pip`, `edit-full`), das Template liegt darüber.
@@ -112,6 +112,10 @@ Ein vorhandenes Template in `SK/studio/compositions/` kopieren und anpassen. Was
   sie pro Instanz gescoped. In `brand/edit.js` aufgerufen liefern sie nichts bzw. die falsche Instanz.
 - Nur deterministische Animation: GSAP-Tweens auf der einen pausierten Timeline, kein
   `Math.random`, `Date.now`, `fetch`, keine CSS-Animationen.
+- **Variablen-IDs dürfen nicht wie Marken-Tokens heißen** (`bg`, `text`, `accent`, `surface`, `line`,
+  `muted`, `u`, ...): HyperFrames legt jede Variable im Render zusätzlich als CSS-Property `--<id>` auf
+  die Szene und überschreibt damit das Token (eine Variable `bg` machte Karten im Render durchsichtig).
+  Jede neue Szene im echten Render über laufendem Video prüfen, nicht nur auf leerem Grund.
 - Variablen in `data-composition-variables` am `<html>` deklarieren (mit Default), danach Template
   auch in den Katalog oben eintragen und mit `snapshot` in Quer- und Hochformat prüfen.
 

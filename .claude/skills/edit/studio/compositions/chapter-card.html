@@ -1,6 +1,6 @@
 <!doctype html>
 <!-- edit skill scene template: chapter-card. Colors/fonts: ../brand/brand.css. Do not hard-code either here. -->
-<html lang="de" data-composition-variables='[{"id": "number", "type": "string", "label": "Kapitelnummer", "default": "01"}, {"id": "title", "type": "string", "label": "Kapiteltitel", "default": "Das Setup"}, {"id": "bg", "type": "string", "label": "solid = Vollbild-Karte, overlay = über Footage", "default": "solid"}, {"id": "duration", "type": "number", "label": "Länge in Sekunden (= data-duration am Host)", "default": 2.5}]'>
+<html lang="de" data-composition-variables='[{"id": "number", "type": "string", "label": "Kapitelnummer", "default": "01"}, {"id": "title", "type": "string", "label": "Kapiteltitel", "default": "Das Setup"}, {"id": "card", "type": "string", "label": "solid = Vollbild-Karte, overlay = über Footage", "default": "solid"}, {"id": "duration", "type": "number", "label": "Länge in Sekunden (= data-duration am Host)", "default": 2.5}]'>
   <head>
     <meta charset="UTF-8" />
     <link rel="stylesheet" href="../brand/brand.css" />
@@ -37,7 +37,7 @@
       (function () {
         var tl = gsap.timeline({ paused: true });
         EDIT.scene(window.__hyperframes.getVariables(), document.querySelector(".scene"), tl, function (v, tl, dur, q, root) {
-        root.classList.add(v.bg === "overlay" ? "scrim" : "solid");
+        root.classList.add(v.card === "overlay" ? "scrim" : "solid");
         q(".num span").textContent = v.number;
         var w = EDIT.words(q(".title"), v.title);
         tl.fromTo(q(".num span"), { yPercent: 110 }, { yPercent: 0, duration: 0.7, ease: EDIT.EASE }, 0.05);

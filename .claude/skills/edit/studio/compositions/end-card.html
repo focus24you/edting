@@ -1,6 +1,6 @@
 <!doctype html>
 <!-- edit skill scene template: end-card. Colors/fonts: ../brand/brand.css. Do not hard-code either here. -->
-<html lang="de" data-composition-variables='[{"id": "headline", "type": "string", "label": "Schlusszeile, *Sternchen* = Akzent", "default": "Mehr davon? *Abonnieren.*"}, {"id": "cta", "type": "string", "label": "Button-Text", "default": "Nächstes Video ansehen"}, {"id": "handle", "type": "string", "label": "Kanal / Handle", "default": "@deinkanal"}, {"id": "bg", "type": "string", "label": "solid = Vollbild-Karte, overlay = über Footage", "default": "solid"}, {"id": "duration", "type": "number", "label": "Länge in Sekunden (= data-duration am Host)", "default": 5}]'>
+<html lang="de" data-composition-variables='[{"id": "headline", "type": "string", "label": "Schlusszeile, *Sternchen* = Akzent", "default": "Mehr davon? *Abonnieren.*"}, {"id": "cta", "type": "string", "label": "Button-Text", "default": "Nächstes Video ansehen"}, {"id": "handle", "type": "string", "label": "Kanal / Handle", "default": "@deinkanal"}, {"id": "card", "type": "string", "label": "solid = Vollbild-Karte, overlay = über Footage", "default": "solid"}, {"id": "duration", "type": "number", "label": "Länge in Sekunden (= data-duration am Host)", "default": 5}]'>
   <head>
     <meta charset="UTF-8" />
     <link rel="stylesheet" href="../brand/brand.css" />
@@ -33,7 +33,7 @@
       (function () {
         var tl = gsap.timeline({ paused: true });
         EDIT.scene(window.__hyperframes.getVariables(), document.querySelector(".scene"), tl, function (v, tl, dur, q, root) {
-        root.classList.add(v.bg === "overlay" ? "scrim" : "solid");
+        root.classList.add(v.card === "overlay" ? "scrim" : "solid");
         q(".cta").textContent = v.cta || ""; q(".handle").textContent = v.handle || "";
         if (!v.cta) q(".cta").style.display = "none";
         var w = EDIT.words(q(".head"), v.headline);

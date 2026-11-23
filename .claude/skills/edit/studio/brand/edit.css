@@ -36,10 +36,9 @@ html, body { width: 100vw; height: 100vh; overflow: hidden; background: transpar
 .edit-split-a, .edit-split-b { position: absolute; top: 0; width: 50vw; height: 100vh; object-fit: cover; }
 .edit-split-a { left: 0; }
 .edit-split-b { left: 50vw; }
-.edit-pip { position: absolute; right: var(--pip-m); bottom: var(--pip-m); width: var(--pip-w); aspect-ratio: 16 / 9; object-fit: cover; border-radius: calc(var(--u) * 18); outline: calc(var(--u) * 5) solid var(--accent); box-shadow: 0 calc(var(--u) * 18) calc(var(--u) * 60) rgba(0, 0, 0, 0.55); }
+.edit-pip { position: absolute; right: var(--pip-m); bottom: var(--pip-m); width: var(--pip-w); aspect-ratio: 16 / 9; object-fit: cover; border-radius: calc(var(--u) * 18); }
 .edit-pip.left { right: auto; left: var(--pip-m); }
 .edit-pip.top { bottom: auto; top: var(--pip-m); }
-.edit-pip.round { aspect-ratio: 1; border-radius: 50%; width: calc(var(--pip-w) * 0.72); }
 @media (orientation: portrait) {
   .edit-split-a, .edit-split-b { left: 0; width: 100vw; height: 50vh; }
   .edit-split-b { top: 50vh; }

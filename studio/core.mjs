@@ -163,7 +163,7 @@ export function build(p) {
       const c = String(v.corner || "br");
       L.push(video(id + "-v", `edit-pip${c.includes("l") ? " left" : ""}${c[0] === "t" ? " top" : ""}`, start, d, m[0], z, ms));
     }
-    if (SOLID.has(s.template) && v.bg !== "overlay") covered.push([start, start + d]);
+    if (SOLID.has(s.template) && v.card !== "overlay") covered.push([start, start + d]);
     L.push(`      <div id="${id}" class="layer" style="z-index:${z + 1}" data-composition-id="${id}" data-composition-src="compositions/${s.template}.html" data-start="${start}" data-duration="${d}" data-track-index="${2 + (i % 6)}" data-variable-values='${attr(v)}'></div>`);
   });
   const c = p.captions || {};

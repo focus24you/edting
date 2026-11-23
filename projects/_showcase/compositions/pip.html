@@ -10,6 +10,10 @@
     <style>
       /* Label for the host <video class="edit-pip">. Add classes left/top on the video to match `corner`. */
       .tag { position: absolute; right: var(--pip-m); bottom: calc(var(--pip-m) + var(--pip-w) * 9 / 16 + var(--u) * 18); background: var(--accent); color: var(--accent-ink); font-size: calc(var(--u) * 44); padding: calc(var(--u) * 10) calc(var(--u) * 18) calc(var(--u) * 3); line-height: 1; }
+      /* The frame is drawn here, not as an outline on the video: the renderer drops outline/shadow on <video>. */
+      .ring { position: absolute; right: var(--pip-m); bottom: var(--pip-m); width: var(--pip-w); aspect-ratio: 16 / 9; border-radius: calc(var(--u) * 18); border: calc(var(--u) * 5) solid var(--accent); box-shadow: 0 calc(var(--u) * 18) calc(var(--u) * 60) rgba(0, 0, 0, 0.45); }
+      .ring.l { right: auto; left: var(--pip-m); }
+      .ring.t { bottom: auto; top: var(--pip-m); }
       .tag.l { right: auto; left: var(--pip-m); }
       .tag.t { bottom: auto; top: calc(var(--pip-m) + var(--pip-w) * 9 / 16 + var(--u) * 18); }
     </style>
@@ -18,7 +22,8 @@
     <!-- data-duration is a ceiling; the host element's data-duration decides the real length -->
     <div id="root" data-composition-id="pip" data-width="1920" data-height="1080" data-start="0" data-duration="3600">
       <div class="scene">
-      <div class="display tag"></div>
+      <div class="ring"></div>
+        <div class="display tag"></div>
       </div>
     </div>
     <script>
@@ -29,8 +34,9 @@
         EDIT.scene(window.__hyperframes.getVariables(), document.querySelector(".scene"), tl, function (v, tl, dur, q, root) {
         var t = q(".tag"), c = String(v.corner || "br");
         t.textContent = v.label || "";
-        if (c.indexOf("l") >= 0) t.classList.add("l");
-        if (c.charAt(0) === "t") t.classList.add("t");
+        var ring = q(".ring");
+        if (c.indexOf("l") >= 0) { t.classList.add("l"); ring.classList.add("l"); }
+        if (c.charAt(0) === "t") { t.classList.add("t"); ring.classList.add("t"); }
         tl.fromTo(t, { clipPath: "inset(0 100% 0 0)" }, { clipPath: "inset(0 0% 0 0)", duration: 0.4, ease: EDIT.EASE }, 0.2);
         EDIT.out(tl, t, dur, 0.2);
         });

@@ -1,6 +1,6 @@
 <!doctype html>
 <!-- edit skill scene template: list. Colors/fonts: ../brand/brand.css. Do not hard-code either here. -->
-<html lang="de" data-composition-variables='[{"id": "title", "type": "string", "label": "Überschrift", "default": "3 Schritte zum *fertigen* Video"}, {"id": "items", "type": "string", "label": "Punkte, getrennt mit |", "default": "Rohmaterial sichten|Pausen rausschneiden|Grafiken setzen"}, {"id": "times", "type": "string", "label": "optional: Einblendzeit je Punkt in s, getrennt mit | (passend zur Stimme)", "default": ""}, {"id": "bg", "type": "string", "label": "solid = Vollbild-Karte, overlay = über Footage", "default": "solid"}, {"id": "duration", "type": "number", "label": "Länge in Sekunden (= data-duration am Host)", "default": 7}]'>
+<html lang="de" data-composition-variables='[{"id": "title", "type": "string", "label": "Überschrift", "default": "3 Schritte zum *fertigen* Video"}, {"id": "items", "type": "string", "label": "Punkte, getrennt mit |", "default": "Rohmaterial sichten|Pausen rausschneiden|Grafiken setzen"}, {"id": "times", "type": "string", "label": "optional: Einblendzeit je Punkt in s, getrennt mit | (passend zur Stimme)", "default": ""}, {"id": "card", "type": "string", "label": "solid = Vollbild-Karte, overlay = über Footage", "default": "solid"}, {"id": "duration", "type": "number", "label": "Länge in Sekunden (= data-duration am Host)", "default": 7}]'>
   <head>
     <meta charset="UTF-8" />
     <link rel="stylesheet" href="../brand/brand.css" />
@@ -35,7 +35,7 @@
       (function () {
         var tl = gsap.timeline({ paused: true });
         EDIT.scene(window.__hyperframes.getVariables(), document.querySelector(".scene"), tl, function (v, tl, dur, q, root) {
-        root.classList.add(v.bg === "overlay" ? "scrim" : "solid");
+        root.classList.add(v.card === "overlay" ? "scrim" : "solid");
         var items = String(v.items).split("|").map(function (s) { return s.trim(); }).filter(Boolean);
         var times = String(v.times || "").split("|").map(parseFloat);
         var step = Math.min(1.1, Math.max(0.25, (dur - 2) / items.length));

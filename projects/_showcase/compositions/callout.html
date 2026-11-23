@@ -1,6 +1,6 @@
 <!doctype html>
 <!-- edit skill scene template: callout. Colors/fonts: ../brand/brand.css. Do not hard-code either here. -->
-<html lang="de" data-composition-variables='[{"id": "text", "type": "string", "label": "Stichwort", "default": "Hier klicken"}, {"id": "x", "type": "number", "label": "Zielpunkt X in % der Breite", "default": 50}, {"id": "y", "type": "number", "label": "Zielpunkt Y in % der Höhe", "default": 50}, {"id": "side", "type": "string", "label": "Label rechts (right) oder links (left) vom Punkt", "default": "right"}, {"id": "duration", "type": "number", "label": "Länge in Sekunden (= data-duration am Host)", "default": 3}]'>
+<html lang="de" data-composition-variables='[{"id": "word", "type": "string", "label": "Stichwort", "default": "Hier klicken"}, {"id": "x", "type": "number", "label": "Zielpunkt X in % der Breite", "default": 50}, {"id": "y", "type": "number", "label": "Zielpunkt Y in % der Höhe", "default": 50}, {"id": "side", "type": "string", "label": "Label rechts (right) oder links (left) vom Punkt", "default": "right"}, {"id": "duration", "type": "number", "label": "Länge in Sekunden (= data-duration am Host)", "default": 3}]'>
   <head>
     <meta charset="UTF-8" />
     <link rel="stylesheet" href="../brand/brand.css" />
@@ -36,7 +36,7 @@
         var a = q(".anchor"), left = v.side === "left";
         a.style.left = Number(v.x) + "%"; a.style.top = Number(v.y) + "%";
         if (left) a.classList.add("left");
-        q(".pill").textContent = v.text;
+        q(".pill").textContent = v.word;
         var hide = left ? "inset(0 0 0 100%)" : "inset(0 100% 0 0)";
         tl.fromTo(q(".dot"), { scale: 0 }, { scale: 1, duration: 0.3, ease: "back.out(2.5)" }, 0.05);
         tl.fromTo(q(".ring"), { scale: 0.4, opacity: 1 }, { scale: 1.5, opacity: 0, duration: 0.7, ease: "power2.out" }, 0.1);

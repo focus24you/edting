@@ -1,6 +1,6 @@
 <!doctype html>
 <!-- edit skill scene template: title-card. Colors/fonts: ../brand/brand.css. Do not hard-code either here. -->
-<html lang="de" data-composition-variables='[{"id": "kicker", "type": "string", "label": "Kleine Zeile über dem Titel", "default": "Neue Folge"}, {"id": "title", "type": "string", "label": "Titel, *Sternchen* = Akzentfarbe", "default": "So schneidest du *doppelt* so schnell"}, {"id": "bg", "type": "string", "label": "solid = Vollbild-Karte, overlay = über Footage", "default": "solid"}, {"id": "duration", "type": "number", "label": "Länge in Sekunden (= data-duration am Host)", "default": 4}]'>
+<html lang="de" data-composition-variables='[{"id": "kicker", "type": "string", "label": "Kleine Zeile über dem Titel", "default": "Neue Folge"}, {"id": "title", "type": "string", "label": "Titel, *Sternchen* = Akzentfarbe", "default": "So schneidest du *doppelt* so schnell"}, {"id": "card", "type": "string", "label": "solid = Vollbild-Karte, overlay = über Footage", "default": "solid"}, {"id": "duration", "type": "number", "label": "Länge in Sekunden (= data-duration am Host)", "default": 4}]'>
   <head>
     <meta charset="UTF-8" />
     <link rel="stylesheet" href="../brand/brand.css" />
@@ -31,7 +31,7 @@
       (function () {
         var tl = gsap.timeline({ paused: true });
         EDIT.scene(window.__hyperframes.getVariables(), document.querySelector(".scene"), tl, function (v, tl, dur, q, root) {
-        root.classList.add(v.bg === "overlay" ? "scrim" : "solid");
+        root.classList.add(v.card === "overlay" ? "scrim" : "solid");
         q(".kicker").textContent = v.kicker || "";
         if (!v.kicker) q(".kick").style.display = "none";
         var t = q(".title"), len = String(v.title).replace(/\*/g, "").length;

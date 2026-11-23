@@ -27,7 +27,7 @@ const VIDEO = /\.(mp4|mov|m4v|webm|mkv|avi)$/i;
 
 let state = { projects: [], jobs: [] }, templates = [], view = null, uploads = [];
 const prefs = { shape: "auto", language: "auto", model: "small", cut: false };
-const OPTIONS = { bg: [["solid", "Vollbild-Karte"], ["overlay", "Über dem Video"]], side: [["left", "Links"], ["right", "Rechts"]], corner: [["br", "Unten rechts"], ["bl", "Unten links"], ["tr", "Oben rechts"], ["tl", "Oben links"]] };
+const OPTIONS = { card: [["solid", "Vollbild-Karte"], ["overlay", "Über dem Video"]], side: [["left", "Links"], ["right", "Rechts"]], corner: [["br", "Unten rechts"], ["bl", "Unten links"], ["tr", "Oben rechts"], ["tl", "Oben links"]] };
 const SOLID = new Set(["title-card", "chapter-card", "list", "stat", "quote", "end-card", "screen-frame"]);
 const LONG = new Set(["title", "quote", "items", "headline"]);
 
@@ -225,7 +225,7 @@ async function Editor(id) {
     head.style.left = t * pps() + "px";
     const active = p.scenes.filter((s) => t >= s.start && t < s.start + s.duration);
     // same rule as the build: no captions while a full-screen card covers the picture
-    const covered = p.captions.hideOnCards && active.some((s) => SOLID.has(s.template) && (s.vars.bg ?? "solid") !== "overlay");
+    const covered = p.captions.hideOnCards && active.some((s) => SOLID.has(s.template) && (s.vars.card ?? "solid") !== "overlay");
     const g = p.captions.enabled && !covered ? p.captions.groups.find((g) => g.words.length && t >= g.start && t < g.end) : null;
     cap.className = "cap" + (p.captions.position === "center" ? " center" : "");
     if (g !== lastGroup) { lastGroup = g; cap.replaceChildren(...(g ? g.words.map((w) => h("span", {}, w.t)) : [])); }
@@ -280,7 +280,6 @@ async function Editor(id) {
         h("h3", { style: "margin-top:22px" }, "Szene hinzufügen"),
         h("div", { class: "pal" }, templates.map((t) => h("button", { onclick: () => {
           const vars = Object.fromEntries(t.vars.map((v) => [v.id, v.default]));
-          if (t.vars.some((v) => v.id === "bg") && ["lower-third", "callout"].includes(t.id) === false && t.id !== "title-card" && t.id !== "end-card") vars.bg = "solid";
           const st = +Math.min(video.currentTime || 0, Math.max(0, p.duration - 1)).toFixed(2);
           p.scenes.push({ template: t.id, start: st, duration: +Math.min(t.dur, p.duration - st).toFixed(2), vars, media: [] });
           sel = p.scenes.length - 1; save(); drawTimeline(); drawPanel();
