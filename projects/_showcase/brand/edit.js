@@ -34,10 +34,16 @@ window.EDIT = (function () {
     if (Number(v.duration)) tl.set({}, {}, dur);
     return tl;
   }
+  /* Largest display size (in u) at which the longest word of `text` still fits the frame width. */
+  function maxSize(text) {
+    var longest = String(text || "").replace(/\*/g, "").split(/\s+/).reduce(function (m, w) { return Math.max(m, w.length); }, 1);
+    var portrait = innerHeight > innerWidth, availU = (innerWidth / Math.min(innerWidth, innerHeight)) * 1080 - 2 * (portrait ? 72 : 110);
+    return availU / (longest * 0.43);
+  }
   /* Standard exit: quick fade of the whole scene content just before the end. */
   function out(tl, target, dur, len) {
     len = len || 0.3;
     return tl.to(target, { opacity: 0, duration: len, ease: "power2.in" }, Math.max(0, dur - len));
   }
-  return { esc: esc, words: words, rise: rise, scene: scene, out: out, EASE: EASE };
+  return { maxSize: maxSize, esc: esc, words: words, rise: rise, scene: scene, out: out, EASE: EASE };
 })();

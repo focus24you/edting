@@ -36,7 +36,7 @@
         EDIT.scene(window.__hyperframes.getVariables(), document.querySelector(".scene"), tl, function (v, tl, dur, q, root) {
         root.classList.add(v.card === "overlay" ? "scrim" : "solid");
         var qe = q(".q"), len = String(v.quote).length;
-        if (len > 60) qe.style.fontSize = "calc(var(--u) * " + Math.round(128 * Math.sqrt(60 / len)) + ")";
+        qe.style.fontSize = "calc(var(--u) * " + Math.round(Math.min((innerWidth > innerHeight ? 128 : 122) * (len > 60 ? Math.sqrt(60 / len) : 1), EDIT.maxSize(v.quote))) + ")";
         q(".author").textContent = v.author || "";
         if (!v.author) q(".by").style.display = "none";
         var w = EDIT.words(qe, v.quote);

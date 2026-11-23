@@ -1,0 +1,50 @@
+<!doctype html>
+<!-- edit skill scene template: end-card. Colors/fonts: ../brand/brand.css. Do not hard-code either here. -->
+<html lang="de" data-composition-variables='[{"id": "headline", "type": "string", "label": "Schlusszeile, *Sternchen* = Akzent", "default": "Mehr davon? *Abonnieren.*"}, {"id": "cta", "type": "string", "label": "Button-Text", "default": "Nächstes Video ansehen"}, {"id": "handle", "type": "string", "label": "Kanal / Handle", "default": "@deinkanal"}, {"id": "card", "type": "string", "label": "solid = Vollbild-Karte, overlay = über Footage", "default": "solid"}, {"id": "duration", "type": "number", "label": "Länge in Sekunden (= data-duration am Host)", "default": 5}]'>
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="stylesheet" href="../brand/brand.css" />
+    <link rel="stylesheet" href="../brand/edit.css" />
+    <script src="../brand/gsap.min.js"></script>
+    <script src="../brand/edit.js"></script>
+    <style>
+      .box { position: absolute; left: var(--pad-x); right: var(--pad-x); top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; align-items: center; text-align: center; }
+      .head { font-size: calc(var(--u) * 190); max-width: 14ch; }
+      .head .wm { margin: 0 0.12em; }
+      .cta { margin-top: calc(var(--u) * 52); background: var(--accent); color: var(--accent-ink); font-size: calc(var(--u) * 64); line-height: 1; padding: calc(var(--u) * 22) calc(var(--u) * 44) calc(var(--u) * 12); border-radius: calc(var(--u) * 8); }
+      .handle { margin-top: calc(var(--u) * 36); }
+      @media (orientation: portrait) { .head { font-size: calc(var(--u) * 176); max-width: 9ch; } }
+    </style>
+  </head>
+  <body>
+    <!-- data-duration is a ceiling; the host element's data-duration decides the real length -->
+    <div id="root" data-composition-id="end-card" data-width="1080" data-height="1920" data-start="0" data-duration="3600">
+      <div class="scene">
+      <div class="box">
+        <div class="display head"></div>
+        <div class="display cta"></div>
+        <div class="label handle"></div>
+      </div>
+      </div>
+    </div>
+    <script>
+      // HyperFrames scopes document / gsap / __hyperframes per instance in THIS inline script only,
+      // so variables, the scene node and the timeline are fetched here and handed to the shared helper.
+      (function () {
+        var tl = gsap.timeline({ paused: true });
+        EDIT.scene(window.__hyperframes.getVariables(), document.querySelector(".scene"), tl, function (v, tl, dur, q, root) {
+        root.classList.add(v.card === "overlay" ? "scrim" : "solid");
+        q(".cta").textContent = v.cta || ""; q(".handle").textContent = v.handle || "";
+        if (!v.cta) q(".cta").style.display = "none";
+        q(".head").style.fontSize = "calc(var(--u) * " + Math.round(Math.min(innerWidth > innerHeight ? 190 : 176, EDIT.maxSize(v.headline))) + ")";
+        var w = EDIT.words(q(".head"), v.headline);
+        EDIT.rise(tl, w, 0.1, 0.07);
+        var after = 0.1 + w.length * 0.07 + 0.25;
+        tl.fromTo(q(".cta"), { scale: 0.6, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.45, ease: "back.out(1.8)" }, after);
+        tl.fromTo(q(".handle"), { opacity: 0 }, { opacity: 1, duration: 0.4 }, after + 0.25);
+        });
+        window.__timelines["end-card"] = tl;
+      })();
+    </script>
+  </body>
+</html>

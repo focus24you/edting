@@ -24,7 +24,7 @@ html, body { width: 100vw; height: 100vh; overflow: hidden; background: transpar
 .hl { color: var(--accent); }
 .rule { height: calc(var(--u) * 8); width: calc(var(--u) * 120); background: var(--accent); transform-origin: 0 50%; }
 /* word masks used by EDIT.words(): each word rises out of its own clipping box */
-.wm { display: inline-block; overflow: hidden; vertical-align: top; padding-top: 0.06em; margin-right: 0.24em; }
+.wm { display: inline-block; overflow: hidden; vertical-align: top; padding-top: 0.1em; margin-right: 0.24em; }
 .wm:last-child { margin-right: 0; }
 .w { display: inline-block; will-change: transform; }
 

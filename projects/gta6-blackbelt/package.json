@@ -1,0 +1,9 @@
+{
+  "name": "gta6-blackbelt",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "check": "npx --prefix ../.. hyperframes check",
+    "render": "npx --prefix ../.. hyperframes render"
+  }
+}

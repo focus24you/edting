@@ -35,7 +35,8 @@
         q(".kicker").textContent = v.kicker || "";
         if (!v.kicker) q(".kick").style.display = "none";
         var t = q(".title"), len = String(v.title).replace(/\*/g, "").length;
-        if (len > 34) t.style.fontSize = "calc(var(--u) * " + Math.round((innerWidth > innerHeight ? 200 : 176) * Math.sqrt(34 / len)) + ")";
+        var size = (innerWidth > innerHeight ? 200 : 176) * (len > 34 ? Math.sqrt(34 / len) : 1);
+        t.style.fontSize = "calc(var(--u) * " + Math.round(Math.min(size, EDIT.maxSize(v.title))) + ")";
         var w = EDIT.words(t, v.title);
         tl.fromTo(q(".rule"), { scaleX: 0 }, { scaleX: 1, duration: 0.5, ease: EDIT.EASE }, 0.1);
         tl.fromTo(q(".kicker"), { opacity: 0, x: -16 }, { opacity: 1, x: 0, duration: 0.4, ease: "power3.out" }, 0.2);

@@ -1,0 +1,29 @@
+<!doctype html>
+<!-- GENERATED from studio.json by studio/core.mjs. Edit studio.json (or use the studio UI), then: node studio/cli.mjs build gta6-blackbelt -->
+<html lang="de">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1080, height=1920" />
+    <link rel="stylesheet" href="brand/brand.css" />
+    <link rel="stylesheet" href="brand/edit.css" />
+    <script src="brand/gsap.min.js"></script>
+    <style>
+      html, body { width: 1080px; height: 1920px; background: var(--bg); }
+      #film { position: relative; width: 1080px; height: 1920px; overflow: hidden; }
+    </style>
+  </head>
+  <body>
+    <div id="film" data-composition-id="main" data-start="0" data-duration="27" data-width="1080" data-height="1920">
+      <div id="sc1-title-card" class="layer" style="z-index:11" data-composition-id="sc1-title-card" data-composition-src="compositions/title-card.html" data-start="0" data-duration="3.2" data-track-index="2" data-variable-values='{"duration":3.2,"kicker":"19.11.2026","title":"GTA 6 ist *draußen.*","card":"solid"}'></div>
+      <div id="sc2-stat" class="layer" style="z-index:15" data-composition-id="sc2-stat" data-composition-src="compositions/stat.html" data-start="3.2" data-duration="3.8" data-track-index="3" data-variable-values='{"duration":3.8,"value":2,"decimals":0,"prefix":"","suffix":"×","label":"hat Rockstar den Release verschoben. Für mehr Feinschliff.","locale":"de-DE","card":"solid"}'></div>
+      <div id="sc3-title-card" class="layer" style="z-index:19" data-composition-id="sc3-title-card" data-composition-src="compositions/title-card.html" data-start="7" data-duration="3.6" data-track-index="4" data-variable-values='{"duration":3.6,"kicker":"Und du?","title":"Dein Verkaufsgespräch geht *ungeübt* live.","card":"solid"}'></div>
+      <div id="sc4-list" class="layer" style="z-index:23" data-composition-id="sc4-list" data-composition-src="compositions/list.html" data-start="10.6" data-duration="7.4" data-track-index="5" data-variable-values='{"duration":7.4,"title":"Ein Gespräch. *12 Missionen.*","items":"Gatekeeper &amp; Opener|Bedarfsanalyse|Nutzenargumentation|Preisgespräch|Abschluss","times":"0.9|1.8|2.7|3.6|4.5","card":"solid"}'></div>
+      <div id="sc5-stat" class="layer" style="z-index:27" data-composition-id="sc5-stat" data-composition-src="compositions/stat.html" data-start="18" data-duration="3.8" data-track-index="6" data-variable-values='{"duration":3.8,"value":14,"decimals":0,"prefix":"","suffix":"","label":"Techniken gegen jeden Einwand.","locale":"de-DE","card":"solid"}'></div>
+      <div id="sc6-end-card" class="layer" style="z-index:31" data-composition-id="sc6-end-card" data-composition-src="compositions/end-card.html" data-start="21.8" data-duration="5.2" data-track-index="7" data-variable-values='{"duration":5.2,"headline":"Hol dir den *Blackbelt.*","cta":"Marketing Blackbelt","handle":"","card":"solid"}'></div>
+    </div>
+    <script>
+      window.__timelines = window.__timelines || {};
+      window.__timelines["main"] = gsap.timeline({ paused: true });
+    </script>
+  </body>
+</html>

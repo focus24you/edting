@@ -1,0 +1,50 @@
+<!doctype html>
+<!-- edit skill scene template: title-card. Colors/fonts: ../brand/brand.css. Do not hard-code either here. -->
+<html lang="de" data-composition-variables='[{"id": "kicker", "type": "string", "label": "Kleine Zeile über dem Titel", "default": "Neue Folge"}, {"id": "title", "type": "string", "label": "Titel, *Sternchen* = Akzentfarbe", "default": "So schneidest du *doppelt* so schnell"}, {"id": "card", "type": "string", "label": "solid = Vollbild-Karte, overlay = über Footage", "default": "solid"}, {"id": "duration", "type": "number", "label": "Länge in Sekunden (= data-duration am Host)", "default": 4}]'>
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="stylesheet" href="../brand/brand.css" />
+    <link rel="stylesheet" href="../brand/edit.css" />
+    <script src="../brand/gsap.min.js"></script>
+    <script src="../brand/edit.js"></script>
+    <style>
+      .box { position: absolute; left: var(--pad-x); right: var(--pad-x); top: 50%; transform: translateY(-50%); }
+      .kick { display: flex; align-items: center; gap: calc(var(--u) * 22); margin-bottom: calc(var(--u) * 34); }
+      .kick .rule { width: calc(var(--u) * 72); height: calc(var(--u) * 6); }
+      .title { font-size: calc(var(--u) * 200); max-width: 16ch; }
+      @media (orientation: portrait) { .title { font-size: calc(var(--u) * 176); max-width: none; } }
+    </style>
+  </head>
+  <body>
+    <!-- data-duration is a ceiling; the host element's data-duration decides the real length -->
+    <div id="root" data-composition-id="title-card" data-width="1080" data-height="1920" data-start="0" data-duration="3600">
+      <div class="scene">
+      <div class="box">
+        <div class="kick"><div class="rule"></div><div class="label kicker"></div></div>
+        <div class="display title"></div>
+      </div>
+      </div>
+    </div>
+    <script>
+      // HyperFrames scopes document / gsap / __hyperframes per instance in THIS inline script only,
+      // so variables, the scene node and the timeline are fetched here and handed to the shared helper.
+      (function () {
+        var tl = gsap.timeline({ paused: true });
+        EDIT.scene(window.__hyperframes.getVariables(), document.querySelector(".scene"), tl, function (v, tl, dur, q, root) {
+        root.classList.add(v.card === "overlay" ? "scrim" : "solid");
+        q(".kicker").textContent = v.kicker || "";
+        if (!v.kicker) q(".kick").style.display = "none";
+        var t = q(".title"), len = String(v.title).replace(/\*/g, "").length;
+        var size = (innerWidth > innerHeight ? 200 : 176) * (len > 34 ? Math.sqrt(34 / len) : 1);
+        t.style.fontSize = "calc(var(--u) * " + Math.round(Math.min(size, EDIT.maxSize(v.title))) + ")";
+        var w = EDIT.words(t, v.title);
+        tl.fromTo(q(".rule"), { scaleX: 0 }, { scaleX: 1, duration: 0.5, ease: EDIT.EASE }, 0.1);
+        tl.fromTo(q(".kicker"), { opacity: 0, x: -16 }, { opacity: 1, x: 0, duration: 0.4, ease: "power3.out" }, 0.2);
+        EDIT.rise(tl, w, 0.28, 0.07);
+        EDIT.out(tl, q(".box"), dur);
+        });
+        window.__timelines["title-card"] = tl;
+      })();
+    </script>
+  </body>
+</html>

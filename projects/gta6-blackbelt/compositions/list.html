@@ -1,0 +1,60 @@
+<!doctype html>
+<!-- edit skill scene template: list. Colors/fonts: ../brand/brand.css. Do not hard-code either here. -->
+<html lang="de" data-composition-variables='[{"id": "title", "type": "string", "label": "Überschrift", "default": "3 Schritte zum *fertigen* Video"}, {"id": "items", "type": "string", "label": "Punkte, getrennt mit |", "default": "Rohmaterial sichten|Pausen rausschneiden|Grafiken setzen"}, {"id": "times", "type": "string", "label": "optional: Einblendzeit je Punkt in s, getrennt mit | (passend zur Stimme)", "default": ""}, {"id": "card", "type": "string", "label": "solid = Vollbild-Karte, overlay = über Footage", "default": "solid"}, {"id": "duration", "type": "number", "label": "Länge in Sekunden (= data-duration am Host)", "default": 7}]'>
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="stylesheet" href="../brand/brand.css" />
+    <link rel="stylesheet" href="../brand/edit.css" />
+    <script src="../brand/gsap.min.js"></script>
+    <script src="../brand/edit.js"></script>
+    <style>
+      .box { position: absolute; left: var(--pad-x); right: var(--pad-x); top: 50%; transform: translateY(-50%); }
+      .title { font-size: calc(var(--u) * 124); margin-bottom: calc(var(--u) * 20); }
+      .rule { margin-bottom: calc(var(--u) * 46); }
+      .item { display: flex; align-items: baseline; gap: calc(var(--u) * 34); padding: calc(var(--u) * 20) 0; border-bottom: calc(var(--u) * 2) solid var(--line); }
+      .n { font-size: calc(var(--u) * 84); color: var(--accent); width: 1.5em; flex: none; overflow: hidden; line-height: 1; padding-top: 0.05em; }
+      .n span { display: inline-block; }
+      .t { font-weight: 600; font-size: calc(var(--u) * 54); line-height: 1.15; letter-spacing: -0.01em; }
+      @media (orientation: portrait) { .t { font-size: calc(var(--u) * 50); } .title { font-size: calc(var(--u) * 132); } }
+    </style>
+  </head>
+  <body>
+    <!-- data-duration is a ceiling; the host element's data-duration decides the real length -->
+    <div id="root" data-composition-id="list" data-width="1080" data-height="1920" data-start="0" data-duration="3600">
+      <div class="scene">
+      <div class="box">
+        <div class="display title"></div>
+        <div class="rule"></div>
+        <div class="items"></div>
+      </div>
+      </div>
+    </div>
+    <script>
+      // HyperFrames scopes document / gsap / __hyperframes per instance in THIS inline script only,
+      // so variables, the scene node and the timeline are fetched here and handed to the shared helper.
+      (function () {
+        var tl = gsap.timeline({ paused: true });
+        EDIT.scene(window.__hyperframes.getVariables(), document.querySelector(".scene"), tl, function (v, tl, dur, q, root) {
+        root.classList.add(v.card === "overlay" ? "scrim" : "solid");
+        var items = String(v.items).split("|").map(function (s) { return s.trim(); }).filter(Boolean);
+        var times = String(v.times || "").split("|").map(parseFloat);
+        var step = Math.min(1.1, Math.max(0.25, (dur - 2) / items.length));
+        if (items.length > 4) root.style.setProperty("--u", "calc(1vmin / " + (10.8 + (items.length - 4) * 1.6) + ")");
+        q(".items").innerHTML = items.map(function (t, i) {
+          return '<div class="item"><div class="display n"><span>' + (i < 9 ? "0" : "") + (i + 1) + '</span></div><div class="t">' + EDIT.esc(t) + "</div></div>";
+        }).join("");
+        EDIT.rise(tl, EDIT.words(q(".title"), v.title), 0.1, 0.05);
+        tl.fromTo(q(".rule"), { scaleX: 0 }, { scaleX: 1, duration: 0.5, ease: EDIT.EASE }, 0.3);
+        root.querySelectorAll(".item").forEach(function (el, i) {
+          var at = isFinite(times[i]) ? times[i] : 0.7 + i * step;
+          tl.fromTo(el, { opacity: 0 }, { opacity: 1, duration: 0.25 }, at);
+          tl.fromTo(el.querySelector(".n span"), { yPercent: 110 }, { yPercent: 0, duration: 0.5, ease: EDIT.EASE }, at);
+          tl.fromTo(el.querySelector(".t"), { x: 28 }, { x: 0, duration: 0.5, ease: EDIT.EASE }, at);
+        });
+        EDIT.out(tl, q(".box"), dur);
+        });
+        window.__timelines["list"] = tl;
+      })();
+    </script>
+  </body>
+</html>

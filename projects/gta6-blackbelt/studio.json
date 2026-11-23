@@ -1,0 +1,88 @@
+{
+ "id": "gta6-blackbelt",
+ "title": "GTA 6 x Marketing Blackbelt",
+ "shape": "portrait",
+ "duration": 27,
+ "hasVideo": false,
+ "status": "ready",
+ "createdAt": "2026-11-23T15:53:03.695Z",
+ "captions": {
+  "enabled": false,
+  "position": "bottom",
+  "maxWords": 2,
+  "hideOnCards": true,
+  "groups": []
+ },
+ "scenes": [
+  {
+   "template": "title-card",
+   "start": 0,
+   "duration": 3.2,
+   "vars": {
+    "kicker": "19.11.2026",
+    "title": "GTA 6 ist *draußen.*",
+    "card": "solid"
+   },
+   "media": []
+  },
+  {
+   "template": "stat",
+   "start": 3.2,
+   "duration": 3.8,
+   "vars": {
+    "value": 2,
+    "suffix": "×",
+    "label": "hat Rockstar den Release verschoben. Für mehr Feinschliff.",
+    "card": "solid"
+   },
+   "media": []
+  },
+  {
+   "template": "title-card",
+   "start": 7,
+   "duration": 3.6,
+   "vars": {
+    "kicker": "Und du?",
+    "title": "Dein Verkaufsgespräch geht *ungeübt* live.",
+    "card": "solid"
+   },
+   "media": []
+  },
+  {
+   "template": "list",
+   "start": 10.6,
+   "duration": 7.4,
+   "vars": {
+    "title": "Ein Gespräch. *12 Missionen.*",
+    "items": "Gatekeeper & Opener|Bedarfsanalyse|Nutzenargumentation|Preisgespräch|Abschluss",
+    "times": "0.9|1.8|2.7|3.6|4.5",
+    "card": "solid"
+   },
+   "media": []
+  },
+  {
+   "template": "stat",
+   "start": 18,
+   "duration": 3.8,
+   "vars": {
+    "value": 14,
+    "suffix": "",
+    "label": "Techniken gegen jeden Einwand.",
+    "card": "solid"
+   },
+   "media": []
+  },
+  {
+   "template": "end-card",
+   "start": 21.8,
+   "duration": 5.2,
+   "vars": {
+    "headline": "Hol dir den *Blackbelt.*",
+    "cta": "Marketing Blackbelt",
+    "handle": "",
+    "card": "solid"
+   },
+   "media": []
+  }
+ ]
+}

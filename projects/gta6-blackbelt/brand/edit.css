@@ -1,0 +1,45 @@
+/* Shared layout + helpers for every scene. Colors and fonts come from brand.css. */
+:root {
+  --u: calc(1vmin / 10.8); /* 1u = 1px on a 1080 short side: scales to 4K and portrait */
+  --pad-x: calc(var(--u) * 110);
+  --pad-y: calc(var(--u) * 96);
+  /* screen-frame window geometry (shared by the template and the host <video class="edit-screen">) */
+  --sf-w: 78vw;
+  --sf-l: 11vw;
+  --sf-h: calc(var(--sf-w) * 9 / 16);
+  --sf-t: calc(50vh - var(--sf-h) / 2 + var(--u) * 34);
+  --pip-w: 24vw;
+  --pip-m: calc(var(--u) * 56);
+}
+@media (orientation: portrait) {
+  :root { --pad-x: calc(var(--u) * 72); --pad-y: calc(var(--u) * 150); --sf-w: 90vw; --sf-l: 5vw; --pip-w: 38vw; }
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { width: 100vw; height: 100vh; overflow: hidden; background: transparent; }
+.scene { position: absolute; inset: 0; overflow: hidden; font-family: var(--font-body); color: var(--text); }
+.solid { background: var(--bg); }
+.scrim { background: linear-gradient(to top, rgba(11, 11, 15, 0.86), rgba(11, 11, 15, 0.55)); }
+.display { font-family: var(--font-display); font-weight: 400; text-transform: uppercase; line-height: 0.92; letter-spacing: 0.012em; }
+.label { font-family: var(--font-body); font-weight: 600; text-transform: uppercase; letter-spacing: 0.16em; font-size: calc(var(--u) * 30); color: var(--muted); }
+.hl { color: var(--accent); }
+.rule { height: calc(var(--u) * 8); width: calc(var(--u) * 120); background: var(--accent); transform-origin: 0 50%; }
+/* word masks used by EDIT.words(): each word rises out of its own clipping box */
+.wm { display: inline-block; overflow: hidden; vertical-align: top; padding-top: 0.1em; margin-right: 0.24em; }
+.wm:last-child { margin-right: 0; }
+.w { display: inline-block; will-change: transform; }
+
+.layer { position: absolute; inset: 0; }
+
+/* ---- host media classes (put these on <video>/<img> in index.html) ---- */
+.edit-full { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.edit-screen { position: absolute; left: var(--sf-l); top: var(--sf-t); width: var(--sf-w); height: var(--sf-h); object-fit: cover; background: #000; }
+.edit-split-a, .edit-split-b { position: absolute; top: 0; width: 50vw; height: 100vh; object-fit: cover; }
+.edit-split-a { left: 0; }
+.edit-split-b { left: 50vw; }
+.edit-pip { position: absolute; right: var(--pip-m); bottom: var(--pip-m); width: var(--pip-w); aspect-ratio: 16 / 9; object-fit: cover; border-radius: calc(var(--u) * 18); }
+.edit-pip.left { right: auto; left: var(--pip-m); }
+.edit-pip.top { bottom: auto; top: var(--pip-m); }
+@media (orientation: portrait) {
+  .edit-split-a, .edit-split-b { left: 0; width: 100vw; height: 50vh; }
+  .edit-split-b { top: 50vh; }
+}

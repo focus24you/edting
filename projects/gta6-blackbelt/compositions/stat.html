@@ -1,0 +1,53 @@
+<!doctype html>
+<!-- edit skill scene template: stat. Colors/fonts: ../brand/brand.css. Do not hard-code either here. -->
+<html lang="de" data-composition-variables='[{"id": "value", "type": "number", "label": "Zielzahl", "default": 87}, {"id": "decimals", "type": "number", "label": "Nachkommastellen", "default": 0}, {"id": "prefix", "type": "string", "label": "Vor der Zahl", "default": ""}, {"id": "suffix", "type": "string", "label": "Nach der Zahl", "default": "%"}, {"id": "label", "type": "string", "label": "Erklärzeile", "default": "weniger Zeit im Schnitt"}, {"id": "locale", "type": "string", "label": "Zahlenformat", "default": "de-DE"}, {"id": "card", "type": "string", "label": "solid = Vollbild-Karte, overlay = über Footage", "default": "solid"}, {"id": "duration", "type": "number", "label": "Länge in Sekunden (= data-duration am Host)", "default": 4}]'>
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="stylesheet" href="../brand/brand.css" />
+    <link rel="stylesheet" href="../brand/edit.css" />
+    <script src="../brand/gsap.min.js"></script>
+    <script src="../brand/edit.js"></script>
+    <style>
+      .box { position: absolute; left: var(--pad-x); right: var(--pad-x); top: 50%; transform: translateY(-50%); }
+      .num { font-size: calc(var(--u) * 440); color: var(--accent); line-height: 0.82; white-space: nowrap; font-variant-numeric: tabular-nums; }
+      .num small { font-size: 0.5em; margin-left: 0.04em; }
+      .rule { margin: calc(var(--u) * 30) 0 calc(var(--u) * 28); width: calc(var(--u) * 160); }
+      .lab { font-weight: 600; font-size: calc(var(--u) * 58); line-height: 1.15; letter-spacing: -0.01em; max-width: 22ch; }
+      @media (orientation: portrait) { .num { font-size: calc(var(--u) * 400); } }
+    </style>
+  </head>
+  <body>
+    <!-- data-duration is a ceiling; the host element's data-duration decides the real length -->
+    <div id="root" data-composition-id="stat" data-width="1080" data-height="1920" data-start="0" data-duration="3600">
+      <div class="scene">
+      <div class="box">
+        <div class="display num"><span class="pre"></span><span class="val"></span><small class="suf"></small></div>
+        <div class="rule"></div>
+        <div class="lab"></div>
+      </div>
+      </div>
+    </div>
+    <script>
+      // HyperFrames scopes document / gsap / __hyperframes per instance in THIS inline script only,
+      // so variables, the scene node and the timeline are fetched here and handed to the shared helper.
+      (function () {
+        var tl = gsap.timeline({ paused: true });
+        EDIT.scene(window.__hyperframes.getVariables(), document.querySelector(".scene"), tl, function (v, tl, dur, q, root) {
+        root.classList.add(v.card === "overlay" ? "scrim" : "solid");
+        var dec = Number(v.decimals) || 0, target = Number(v.value) || 0, val = q(".val"), o = { n: 0 };
+        function show() { val.textContent = o.n.toLocaleString(v.locale || "de-DE", { minimumFractionDigits: dec, maximumFractionDigits: dec }); }
+        q(".pre").textContent = v.prefix || ""; q(".suf").textContent = v.suffix || ""; q(".lab").textContent = v.label || "";
+        var digits = (String(Math.round(target)).length + (v.prefix || "").length + (v.suffix || "").length * 0.5);
+        if (digits > 4.5) q(".num").style.fontSize = "calc(var(--u) * " + Math.round(440 * 4.5 / digits) + ")";
+        show();
+        tl.fromTo(q(".num"), { opacity: 0, y: 40 }, { opacity: 1, y: 0, duration: 0.4, ease: EDIT.EASE }, 0.1);
+        tl.fromTo(o, { n: 0 }, { n: target, duration: 1.3, ease: "power3.out", onUpdate: show }, 0.1);
+        tl.fromTo(q(".rule"), { scaleX: 0 }, { scaleX: 1, duration: 0.5, ease: EDIT.EASE }, 0.9);
+        tl.fromTo(q(".lab"), { opacity: 0, y: 18 }, { opacity: 1, y: 0, duration: 0.45, ease: "power3.out" }, 1.0);
+        EDIT.out(tl, q(".box"), dur);
+        });
+        window.__timelines["stat"] = tl;
+      })();
+    </script>
+  </body>
+</html>

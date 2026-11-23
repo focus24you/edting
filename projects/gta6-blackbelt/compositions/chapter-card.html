@@ -1,0 +1,53 @@
+<!doctype html>
+<!-- edit skill scene template: chapter-card. Colors/fonts: ../brand/brand.css. Do not hard-code either here. -->
+<html lang="de" data-composition-variables='[{"id": "number", "type": "string", "label": "Kapitelnummer", "default": "01"}, {"id": "title", "type": "string", "label": "Kapiteltitel", "default": "Das Setup"}, {"id": "card", "type": "string", "label": "solid = Vollbild-Karte, overlay = über Footage", "default": "solid"}, {"id": "duration", "type": "number", "label": "Länge in Sekunden (= data-duration am Host)", "default": 2.5}]'>
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="stylesheet" href="../brand/brand.css" />
+    <link rel="stylesheet" href="../brand/edit.css" />
+    <script src="../brand/gsap.min.js"></script>
+    <script src="../brand/edit.js"></script>
+    <style>
+      .box { position: absolute; left: var(--pad-x); right: var(--pad-x); top: 50%; transform: translateY(-50%); display: flex; align-items: center; gap: calc(var(--u) * 56); }
+      .num { font-size: calc(var(--u) * 420); color: var(--accent); line-height: 0.8; overflow: hidden; padding-top: 0.04em; }
+      .num span { display: inline-block; }
+      .bar { width: calc(var(--u) * 8); align-self: stretch; background: var(--text); transform-origin: 50% 0; }
+      .title { font-size: calc(var(--u) * 150); }
+      @media (orientation: portrait) {
+        .box { flex-direction: column; align-items: flex-start; gap: calc(var(--u) * 36); }
+        .bar { width: calc(var(--u) * 160); height: calc(var(--u) * 8); align-self: auto; transform-origin: 0 50%; }
+        .title { font-size: calc(var(--u) * 150); }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- data-duration is a ceiling; the host element's data-duration decides the real length -->
+    <div id="root" data-composition-id="chapter-card" data-width="1080" data-height="1920" data-start="0" data-duration="3600">
+      <div class="scene">
+      <div class="box">
+        <div class="display num"><span></span></div>
+        <div class="bar"></div>
+        <div><div class="label">Kapitel</div><div class="display title"></div></div>
+      </div>
+      </div>
+    </div>
+    <script>
+      // HyperFrames scopes document / gsap / __hyperframes per instance in THIS inline script only,
+      // so variables, the scene node and the timeline are fetched here and handed to the shared helper.
+      (function () {
+        var tl = gsap.timeline({ paused: true });
+        EDIT.scene(window.__hyperframes.getVariables(), document.querySelector(".scene"), tl, function (v, tl, dur, q, root) {
+        root.classList.add(v.card === "overlay" ? "scrim" : "solid");
+        q(".num span").textContent = v.number;
+        var w = EDIT.words(q(".title"), v.title);
+        tl.fromTo(q(".num span"), { yPercent: 110 }, { yPercent: 0, duration: 0.7, ease: EDIT.EASE }, 0.05);
+        tl.fromTo(q(".bar"), { scale: 0 }, { scale: 1, duration: 0.5, ease: EDIT.EASE }, 0.25);
+        tl.fromTo(q(".label"), { opacity: 0 }, { opacity: 1, duration: 0.3 }, 0.35);
+        EDIT.rise(tl, w, 0.35, 0.07);
+        EDIT.out(tl, q(".box"), dur, 0.25);
+        });
+        window.__timelines["chapter-card"] = tl;
+      })();
+    </script>
+  </body>
+</html>
